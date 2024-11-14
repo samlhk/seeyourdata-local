@@ -3,19 +3,34 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.3.2",
+    "@testing-library/user-event": "^7.1.2",
+    "bootstrap": "^5.3.3",
+    "chartjs": "^0.3.24",
+    "jszip": "^3.10.1",
+    "lda": "^0.2.0",
+    "leaflet": "^1.9.4",
+    "node-html-parser": "^6.1.13",
+    "path": "^0.12.7",
+    "react": "^16.14.0",
+    "react-bootstrap": "^2.10.5",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "^16.14.0",
+    "react-leaflet": "^2.7.0",
+    "react-router-dom": "^6.28.0",
     "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
+    "react-wordcloud": "^1.2.7",
+    "snowball": "^0.3.1"
   },
+  "main": "public/electron.js",
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "NODE_ENV=prod react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "electron": "NODE_ENV=dev electron .",
+    "package": "electron-packager . --platform=linux --arch=x64 --overwrite"
   },
   "eslintConfig": {
     "extends": [
@@ -33,6 +48,16 @@
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-packager": "^17.1.2",
+    "electron-rebuild": "^3.2.9"
+  },
+  "build": {
+    "files": [
+      "src/**/*"
     ]
   }
 }

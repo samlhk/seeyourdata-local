@@ -21,3 +21,8 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+seeyourdata-local-darwin-*
+seeyourdata-local-linux-*
+seeyourdata-local-mas-*
+seeyourdata-local-win32-*
