@@ -1,0 +1,58 @@
+h1 {
+  padding: 0.5rem 2rem;
+}
+
+.home-container {
+  display: grid;
+  grid-template-columns: 50% 50%;
+}
+
+.home-container > * {
+  border: solid black 3px;
+  margin: 0.5rem;
+  padding: 0.5rem;
+}
+
+li {
+  margin-top: 1.5rem;
+}
+
+.upload-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.loading-icon {
+  margin-left: 1rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 5px solid black;
+  border-bottom-color: red;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+     transform: rotate(360deg);
+  }
+}
+
+.explore-more-container:hover {
+  box-shadow: 0.25rem 0.25rem 0.25rem 0.25rem darkgray;
+  cursor: pointer;
+}
+
+.explore-more-bar {
+  display: flex;
+  justify-content: space-between;
+}
+
+.explore-more-container:hover .explore-more-indicator {
+  transform: scale(1.05);
+}

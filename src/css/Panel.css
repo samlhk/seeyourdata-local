@@ -1,5 +1,8 @@
-
 .leaflet-container {
     width: 100%;
     height: 50vh;
+}
+
+.interests-container svg {
+    max-height: 50vh;
 }

@@ -1,17 +1,20 @@
-import './App.css';
 import { HashRouter as Router, Route, Routes } from 'react-router-dom'
-import Home from './components/Home';
+import Home from './pages/Home';
+import Page from './pages/Page';
 
 import 'bootstrap/dist/css/bootstrap.css';
-import './css/Form.css';
-import './css/Home.css';
+import './css/App.css';
+import './css/Page.css';
 import './css/Panel.css';
+import './css/FilterBar.css'
+
 
 function App() {
   return (
     <Router>
       <Routes>
-          <Route path='/' Component={Home}/>
+          <Route path='/' element={ <Home/> }/>
+          <Route path='/activity' element={ <Page category='activity'/> }/>
       </Routes>
     </Router>
   );

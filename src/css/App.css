@@ -1,0 +1,23 @@
+button {
+    border: solid black 2px;
+    width: fit-content;
+  }
+  
+button:hover {
+  color: white;
+  background: rgb(67, 67, 67);
+}
+
+button.highlighted {
+  background: black;
+  color: white;
+}
+
+.success {
+  color: green;
+}
+
+.warning {
+  color: red;
+}
+  

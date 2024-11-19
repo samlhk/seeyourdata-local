@@ -11,44 +11,62 @@ const DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-const Location = () => {
+const Location = ( { db, isHome }) => {
   
   const [locations, setLocations] = useState();
 
   useEffect(() => {
     renderLocation();
-  }, [])
+  }, [db])
 
-  // TODO trigger this after upload
   const renderLocation = async () => {
-    const json = await window.api.readDB();
-
-    if (json && json.location) {
-      setLocations(json.location);
-    }    
+    if (db && db.location) {
+      setLocations(db.location);
+    } else {
+      setLocations(null);
+    }
   }
 
   return (
-    locations ?
-    <>
-      <div>
-        <Map center={locations[0].latlong.split(',')} zoom={1}>
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
-          />
-          {
-            locations.map(location => 
-            <Marker position={location.latlong.split(',')}>
-              <Popup>{location.label}<br />{location.source}</Popup>
-            </Marker>)
-          }
-          
-        </Map>
-      </div>
-      <div>Location visualisation 2</div>
-    </> :
-    <></>
+    isHome ?
+      (locations ?
+        <div>
+          <h4>Locations</h4>
+          <Map center={locations[0].latlong.split(',')} zoom={1}>
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
+            />
+            {
+              locations.map(location => 
+              <Marker position={location.latlong.split(',')}>
+                <Popup>{location.label}<br />{location.source}</Popup>
+              </Marker>)
+            }
+            
+          </Map>
+        </div> : <></>) :
+      (locations ?
+        <>
+          <div>
+            <h4>Locations</h4>
+            <Map center={locations[0].latlong.split(',')} zoom={1}>
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
+              />
+              {
+                locations.map(location => 
+                <Marker position={location.latlong.split(',')}>
+                  <Popup>{location.label}<br />{location.source}</Popup>
+                </Marker>)
+              }
+              
+            </Map>
+          </div>
+          <div>Location visualisation 2</div>
+        </> :
+        <></>)
   )
 }
 

@@ -37,6 +37,10 @@ app.on("ready", async () => {
     }
   })
 
+  ipcMain.handle('get-db-path', async (event, arg) => {
+    return path.join(app.getPath('userData'), 'db.json');
+  })
+
   createWindow();
 });
 
