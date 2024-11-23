@@ -5,6 +5,7 @@ import Interests from '../components/Interests';
 import JSZip from 'jszip';
 import { FaInfoCircle } from "react-icons/fa";
 import { Tooltip } from 'react-tooltip'
+import Dialogue from '../components/Dialogue';
 const { parse } = require('node-html-parser');
 const lda = require('lda');
 
@@ -46,6 +47,7 @@ const Home = () => {
   const uploadFile = async () => {
     setFileUploadStatus(loadingStatus);
     
+    // TODO fix for first time loads
     if (!db) db = {};
 
     if (file) {
@@ -259,6 +261,7 @@ const Home = () => {
         </div>
 
         <Activity db={ db } isHome={ true }/>
+        <Dialogue db={ db } isHome={ true }/>
         <Location db={ db } isHome={ true }/>
         <Interests db={ db } isHome={ true }/>
         <div>Google</div>

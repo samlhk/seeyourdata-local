@@ -26,3 +26,5 @@ seeyourdata-local-darwin-*
 seeyourdata-local-linux-*
 seeyourdata-local-mas-*
 seeyourdata-local-win32-*
+
+/public/models
