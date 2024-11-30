@@ -2,12 +2,37 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path')
 const fs = require('fs')
 
-let prompts, model;
+let mPrompts, model, retriever;
 const setUpLLM = async () => {
-  prompts = await import("@langchain/core/prompts");
+  // TODO improve RAG
+  mPrompts = await import("@langchain/core/prompts");
+  const mJson = await import("langchain/document_loaders/fs/json");
+  const mText = await import("langchain/document_loaders/fs/text");
+  const mTextSplitter = await import("langchain/text_splitter");
+  const mMemory = await import("langchain/vectorstores/memory");
+  const mHfTransformers = await import("@langchain/community/embeddings/hf_transformers");
+  const mRetrieval = await import("langchain/chains/retrieval");
+  const mCombineDocuments = await import("langchain/chains/combine_documents");
+  const mLlamaCpp = await import("@langchain/community/llms/llama_cpp");
+
+  const loader = new mText.TextLoader(path.join(app.getPath('userData'), '1 copy.md'));
+  const docs = await loader.load();
+
+  const splitter = new mTextSplitter.MarkdownTextSplitter({
+    chunkSize: 500,
+    chunkOverlap: 0
+  });
+  const splitDocs = await splitter.splitDocuments(docs);
+
+  const vectorStore = await mMemory.MemoryVectorStore.fromDocuments(
+    splitDocs,
+    new mHfTransformers.HuggingFaceTransformersEmbeddings()
+  )
+  retriever = vectorStore.asRetriever();
+
   const modelPath = path.join(__dirname, "models", "llama-3.2-1b-instruct-q8_0.gguf")
-  const llama_cpp = await import("@langchain/community/llms/llama_cpp");
-  model = new llama_cpp.LlamaCpp({ modelPath: modelPath});
+  
+  model = new mLlamaCpp.LlamaCpp({ modelPath: modelPath});
 }
 
 const isDev = process.env.NODE_ENV === 'dev';
@@ -51,15 +76,35 @@ app.on("ready", async () => {
     return path.join(app.getPath('userData'), 'db.json');
   })
 
+  ipcMain.handle('load-rag', async (event, arg) => {
+    return true;
+  })
+
   ipcMain.handle('ask', async (event, query) => {
     try {
-      const prompt =
-      prompts.ChatPromptTemplate.fromTemplate(`You are an AI chatbot, please give an answer to the following question even if you are unsure: {input}`);
+      // const prompt = mPrompts.ChatPromptTemplate.fromTemplate(`You are an AI chatbot, please give an answer to the following question even if you are unsure: {input}`);
+      // const chain = prompt.pipe(model);
+      // const result = await chain.invoke({ input: query });
+      // return result;
 
-      const chain = prompt.pipe(model);
+      const mRetrieval = await import("langchain/chains/retrieval");
+      const mCombineDocuments = await import("langchain/chains/combine_documents");
+      const prompt = mPrompts.ChatPromptTemplate.fromTemplate(`You are an AI chatbot that have read through a user's activity data in the context tags below, please answer their question based on their activity data in the context tags
+        <context>{context}</context>
+        question: {input}
+      `);
+      const documentChain = await mCombineDocuments.createStuffDocumentsChain({
+        llm: model,
+        prompt
+      });
+      const retrievalChain = await mRetrieval.createRetrievalChain({
+        combineDocsChain: documentChain,
+        retriever
+      })
+      const result = await retrievalChain.invoke({ input: query });
+      console.log(result);
+      return result.answer;
 
-      let result = await chain.invoke({ input: query });
-      return result;
     } catch (err) {
       console.error(err);
     }
