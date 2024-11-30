@@ -79,7 +79,6 @@ const Activity = ({ db, isHome }) => {
             <h4>Activity</h4>
             <button className='explore-more-indicator'>Explore More <FaLongArrowAltRight/></button>
           </div>
-          
           <Line data={{ labels: timeRange, datasets: monthlyActivities }}/>
         </div> : <></>) :
 

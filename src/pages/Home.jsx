@@ -15,7 +15,7 @@ const Home = () => {
   const [downloadFiles, setDownloadFiles] = useState([]);
   const [dbPath, setDBPath] = useState('');
   const [instructions, setInstructions] = useState('');
-  const [db, setDB] = useState();
+  const [db, setDB] = useState({});
 
   const warningStatusPrefix = 'Warning: ';
   const loadingStatus = 'Loading';
@@ -31,7 +31,7 @@ const Home = () => {
 
   const fetchDB = async () => {
     const db = await window.api.readDB();
-    setDB(db);
+    setDB(db || {});
   }
 
   const findDBPath = async () => {
@@ -46,9 +46,6 @@ const Home = () => {
 
   const uploadFile = async () => {
     setFileUploadStatus(loadingStatus);
-    
-    // TODO fix for first time loads
-    if (!db) db = {};
 
     if (file) {
 
@@ -80,97 +77,139 @@ const Home = () => {
       }
 
       // record processed files
-      if (!db.files) db.files =[];
-      db.files = db.files.concat(file.name)
-
-      let instagramActivityFile = zip.file('security_and_login_information/login_and_profile_creation/login_activity.html') ||
-        zip.file(innerZipFolder + 'security_and_login_information/login_and_profile_creation/login_activity.html');
-      if (instagramActivityFile) {
-        console.log('Processing instagram activity');
-        const data = await instagramActivityFile.async('text');
-        const root = parse(data);
-        const dateElements = root.querySelectorAll('._3-95._2pim._a6-h._a6-i');
-        const timestamps = dateElements.map(element => element.innerText).map(timestamp => new Date(timestamp).toString());
-
-        if (!db.activity) db.activity = [];
-        if (db.activity.filter(activity => activity.app === 'instagram').length === 0) db.activity = db.activity.concat([{app: 'instagram', timestamps: []}]);
-        const set = new Set(db.activity.filter(activity => activity.app === 'instagram')[0].timestamps).union(new Set(timestamps));
-        db.activity.filter(activity => activity.app === 'instagram')[0].timestamps = Array.from(set);
-      }
+      if (!db.files) db.files = [];
+      db.files = db.files.concat(`${file.name} (${new Date().toLocaleString()})`)
 
       
-      let offMetaActivityFiles = [];
-      zip.folder('apps_and_websites_off_of_instagram/apps_and_websites/your_activity_off_meta_technologies/')
-        .forEach((relativePath, file) => {offMetaActivityFiles.push(file.name);})
-      zip.folder(innerZipFolder + 'apps_and_websites_off_of_instagram/apps_and_websites/your_activity_off_meta_technologies/')
-        .forEach((relativePath, file) => {offMetaActivityFiles.push(file.name);})
-      for await (const file of offMetaActivityFiles) {
-        const data = await zip.file(file).async('text');
-        const root = parse(data);
-        const appName = root.querySelector('._38my').innerText.replace('Activity received from ', '');
-        console.log(`Processing ${appName} activity`);
-        const dateElements = root.querySelectorAll('._2pin._2piu._a6_r');
-        const timestamps = dateElements.filter((_, id) => id % 3 === 2).map(element => element.innerText).map(timestamp => new Date(timestamp).toString());
-        
+      const addActivity = (app, timestamps) => {
         if (!db.activity) db.activity = [];
-        if (db.activity.filter(activity => activity.app === appName).length === 0) db.activity = db.activity.concat([{app: appName, timestamps: []}]);
-        const set = new Set(db.activity.filter(activity => activity.app === appName)[0].timestamps).union(new Set(timestamps));
-        db.activity.filter(activity => activity.app === appName)[0].timestamps = Array.from(set);
-      };
-
-
-      let googleMapsFile = zip.file('Takeout/My Activity/Maps/My Activity.html') || 
-        zip.file(innerZipFolder + 'Takeout/My Activity/Maps/My Activity.html');
-      if (googleMapsFile) {
-        console.log('Processing google maps');
-        const data = await googleMapsFile.async('text');
-        const root = parse(data);
-        const linkElements = root.getElementsByTagName('a');
-        const locations = [];
-        linkElements.forEach(element => {
-          const latlong = element.getAttribute('href').match(/@-?\d+.\d+,-?\d+.\d+/);
-          if (latlong) {
-            locations.push({
-              latlong: latlong[0].replace('@', ''),
-              label: element.innerText,
-              source: 'Google Maps'
-            })
-          }
-        })
-
-        if (!db.location) db.location = [];
-        const set = new Set(db.location).union(new Set(locations));
-        db.location = Array.from(set);
+        if (!db.activity.find(activity => activity.app === app)) db.activity = db.activity.concat([{app, timestamps: []}]);
+        const set = new Set(db.activity.find(activity => activity.app === app).timestamps).union(new Set(timestamps));
+        db.activity.find(activity => activity.app === app).timestamps = Array.from(set);
       }
 
-
-      const instagramCommentsFiles = [];
-      zip.folder('your_instagram_activity/comments')
-        .forEach((relativePath, file) => {instagramCommentsFiles.push(file.name);});
-      zip.folder(innerZipFolder + 'your_instagram_activity/comments')
-        .forEach((relativePath, file) => {instagramCommentsFiles.push(file.name);});
-      for await (const file of instagramCommentsFiles) {
-        console.log(`Processing instagram comments in file: ${file}`);
-        const data = await zip.file(file).async('text');
-        const root = parse(data);
-        const commentElements = root.querySelectorAll('._2pin._a6_q').filter(element => element.innerText.includes('Comment'));
-        const comments = commentElements.map(element => element.innerText.replace('Comment', ''));
-
+      const addInterestTexts = (source, texts) => {
         if (!db.documents) db.documents = [];
-        if (db.documents.filter(document => document.source === `instagram.${file}`).length === 0) db.documents = db.documents.concat([{source: `instagram.${file}`, texts: []}]);
-        const set = new Set(db.documents.filter(document => document.source === `instagram.${file}`)[0].texts).union(new Set(comments));
-        db.documents.filter(document => document.source === `instagram.${file}`)[0].texts = Array.from(set);
+        if (!db.documents.find(document => document.source === source)) db.documents = db.documents.concat([{source, texts: []}]);
+        const set = new Set(db.documents.find(document => document.source === source).texts).union(new Set(texts));
+        db.documents.find(document => document.source === source).texts = Array.from(set);
       }
-      
-      if (instagramCommentsFiles.length > 0) {
-        console.log(`Updating topic model`);
-        const document = db.documents.reduce((allText, obj) => allText.concat(obj.texts), []);
-        const numberOfTopics = 10;
-        const topics = new lda(document, numberOfTopics, 5).map((topic, id) => {
-          const arr = topic.map(({ term }) => ({ topic: term, weight: numberOfTopics - id}));
-          return arr;
-        }).flat();
-        db.topics = topics;
+
+      try {
+
+        // ---------------------------------
+        // ------------Instagram------------
+        // ---------------------------------
+        
+        let instagramActivityFile = zip.file('security_and_login_information/login_and_profile_creation/login_activity.json') ||
+          zip.file(innerZipFolder + 'security_and_login_information/login_and_profile_creation/login_activity.json');
+        if (instagramActivityFile) {
+          console.log('Processing instagram activity');
+          const data = await instagramActivityFile.async('text');
+          const json = JSON.parse(data);
+          const timestamps = json.account_history_login_history.map(({ title }) => title);
+          addActivity('instagram', timestamps);
+        }
+
+        let instagramOffMetaActivityFile = zip.file('apps_and_websites_off_of_instagram/apps_and_websites/your_activity_off_meta_technologies.json') ||
+          zip.file(innerZipFolder + 'apps_and_websites_off_of_instagram/apps_and_websites/your_activity_off_meta_technologies.json');
+        if (instagramOffMetaActivityFile) {
+          console.log(`Processing instagram off meta activity`);
+          const data = await instagramOffMetaActivityFile.async('text');
+          const json = JSON.parse(data);
+          json.apps_and_websites_off_meta_activity.forEach(({ name, events }) => {
+            const timestamps = events.map(({ timestamp}) => new Date(timestamp * 1000).toString());
+            addActivity(name, timestamps);
+          })
+        };
+
+        let instagramPostCommentsFile = zip.file('your_instagram_activity/comments/post_comments_1.json') ||
+          zip.file(innerZipFolder + 'your_instagram_activity/comments/post_comments_1.json');
+        if (instagramPostCommentsFile) {
+          console.log(`Processing instagram post comments`);
+          const data = await instagramPostCommentsFile.async('text');
+          const json = JSON.parse(data);
+          const comments = json.map(obj => obj.string_map_data?.Comment?.value);
+          addInterestTexts('instagram posts', comments);
+        }
+
+        let instagramReelsCommentsFile = zip.file('your_instagram_activity/comments/reels_comments.json') ||
+          zip.file(innerZipFolder + 'your_instagram_activity/comments/reels_comments.json');
+        if (instagramReelsCommentsFile) {
+          console.log(`Processing instagram reels comments`);
+          const data = await instagramReelsCommentsFile.async('text');
+          const json = JSON.parse(data);
+          const comments = json.comments_reels_comments.map(obj => obj.string_map_data?.Comment?.value);
+          addInterestTexts('instagram reels', comments);
+        }
+
+
+        // ---------------------------------
+        // ------------Google---------------
+        // ---------------------------------
+        
+        let googleMapsFile = zip.file('Takeout/My Activity/Maps/My Activity.html') || 
+          zip.file(innerZipFolder + 'Takeout/My Activity/Maps/My Activity.html');
+        if (googleMapsFile) {
+          console.log('Processing google maps');
+          const data = await googleMapsFile.async('text');
+          const root = parse(data);
+          const linkElements = root.getElementsByTagName('a');
+          const locations = [];
+          linkElements.forEach(element => {
+            const latlong = element.getAttribute('href').match(/@-?\d+.\d+,-?\d+.\d+/);
+            if (latlong) {
+              locations.push({
+                latlong: latlong[0].replace('@', ''),
+                label: element.innerText,
+                source: 'Google Maps'
+              })
+            }
+          })
+          if (!db.location) db.location = [];
+          const set = new Set(db.location).union(new Set(locations));
+          db.location = Array.from(set);
+        }
+
+        // // loop example
+        // const instagramCommentsFiles = [];
+        // zip.folder('your_instagram_activity/comments')
+        //   .forEach((relativePath, file) => {instagramCommentsFiles.push(file.name);});
+        // zip.folder(innerZipFolder + 'your_instagram_activity/comments')
+        //   .forEach((relativePath, file) => {instagramCommentsFiles.push(file.name);});
+        // for await (const file of instagramCommentsFiles) {
+        //   console.log(`Processing instagram comments in file: ${file}`);
+        //   const data = await zip.file(file).async('text');
+        //   const root = parse(data);
+        //   const commentElements = root.querySelectorAll('._2pin._a6_q').filter(element => element.innerText.includes('Comment'));
+        //   const comments = commentElements.map(element => element.innerText.replace('Comment', ''));
+
+        //   if (!db.documents) db.documents = [];
+        //   if (db.documents.filter(document => document.source === `instagram.${file}`).length === 0) db.documents = db.documents.concat([{source: `instagram.${file}`, texts: []}]);
+        //   const set = new Set(db.documents.filter(document => document.source === `instagram.${file}`)[0].texts).union(new Set(comments));
+        //   db.documents.filter(document => document.source === `instagram.${file}`)[0].texts = Array.from(set);
+        // }
+        
+        // ---------------------------------
+        // ------------Misc-----------------
+        // ---------------------------------
+
+        // update topic model
+        if (instagramPostCommentsFile || instagramReelsCommentsFile) {
+          console.log(`Updating topic model`);
+          const document = db.documents.reduce((allText, obj) => allText.concat(obj.texts), []);
+          const numberOfTopics = 10;
+          const topics = new lda(document, numberOfTopics, 5).map((topic, id) => {
+            const arr = topic.map(({ term }) => ({ topic: term, weight: numberOfTopics - id}));
+            return arr;
+          }).flat();
+          db.topics = topics;
+        }
+
+        // update RAG model
+
+      } catch(e) {
+        console.error('Unexpected error processing file: ' + e.message);
       }
     
       const ok = await window.api.writeDB(db);
@@ -198,11 +237,11 @@ const Home = () => {
           <ol>
             <h5><li>Obtain data downloads from online platforms</li></h5>
             See below for instructions and supported platforms: <br/>
-            <button onClick={() => {setInstructions(instructions === 'google' ? '' : 'google')}} className={instructions === 'google' && 'highlighted'}>Google</button>&nbsp;
-            <button onClick={() => {setInstructions(instructions === 'facebook' ? '' : 'facebook')}} className={instructions === 'facebook' && 'highlighted'}>Facebook</button>&nbsp;
-            <button onClick={() => {setInstructions(instructions === 'instagram' ? '' : 'instagram')}} className={instructions === 'instagram' && 'highlighted'}>Instagram</button>&nbsp;
-            <button onClick={() => {setInstructions(instructions === 'x' ? '' : 'x')}} className={instructions === 'x' && 'highlighted'}>X (Twitter)</button>&nbsp;
-            <button onClick={() => {setInstructions(instructions === 'linkedin' ? '' : 'linkedin')}} className={instructions === 'linkedin' && 'highlighted'}>LinkedIn</button>&nbsp;
+            <button onClick={() => {setInstructions(instructions === 'google' ? '' : 'google')}} className={instructions === 'google' ? 'highlighted' : ''}>Google</button>&nbsp;
+            <button onClick={() => {setInstructions(instructions === 'facebook' ? '' : 'facebook')}} className={instructions === 'facebook' ? 'highlighted' : ''}>Facebook</button>&nbsp;
+            <button onClick={() => {setInstructions(instructions === 'instagram' ? '' : 'instagram')}} className={instructions === 'instagram' ? 'highlighted' : ''}>Instagram</button>&nbsp;
+            <button onClick={() => {setInstructions(instructions === 'x' ? '' : 'x')}} className={instructions === 'x' ? 'highlighted' : ''}>X (Twitter)</button>&nbsp;
+            <button onClick={() => {setInstructions(instructions === 'linkedin' ? '' : 'linkedin')}} className={instructions === 'linkedin' ? 'highlighted' : ''}>LinkedIn</button>&nbsp;
             {instructions === 'google' && 
               <ol>
                 <li>Visit <a href='https://takeout.google.com/' target='_blank'>Google Takeout (https://takeout.google.com/)</a> and log in to your Google account</li>

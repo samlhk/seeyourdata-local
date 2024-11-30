@@ -4,6 +4,8 @@ import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
 import "leaflet/dist/leaflet.css";
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import { FaLongArrowAltRight } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -14,6 +16,8 @@ L.Marker.prototype.options.icon = DefaultIcon;
 const Location = ( { db, isHome }) => {
   
   const [locations, setLocations] = useState();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     renderLocation();
@@ -30,8 +34,11 @@ const Location = ( { db, isHome }) => {
   return (
     isHome ?
       (locations ?
-        <div>
-          <h4>Locations</h4>
+        <div className='explore-more-container' onClick={ () => navigate('/location') }>
+          <div className='explore-more-bar'>
+            <h4>Locations</h4>
+            <button className='explore-more-indicator'>Explore More <FaLongArrowAltRight/></button>
+          </div>
           <Map center={locations[0].latlong.split(',')} zoom={1}>
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

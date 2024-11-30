@@ -15,6 +15,8 @@ function App() {
       <Routes>
           <Route path='/' element={ <Home/> }/>
           <Route path='/activity' element={ <Page category='activity'/> }/>
+          <Route path='/interests' element={ <Page category='interests'/> }/>
+          <Route path='/location' element={ <Page category='location'/> }/>
       </Routes>
     </Router>
   );

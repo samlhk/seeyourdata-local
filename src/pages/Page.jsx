@@ -22,9 +22,13 @@ const Page = ({ category }) => {
   return (
     <div>
       {category ==='activity' && <h1>Activity</h1> }
+      {category ==='location' && <h1>Location</h1> }
+      {category ==='interests' && <h1>Interests</h1> }
       <FilterBar db={ db } setFilteredDB = { setFilteredDB }/>
       <div className='home-container'>
         {category === 'activity' && <Activity db={ filteredDB }/> }
+        {category === 'location' && <Location db={ filteredDB }/> }
+        {category === 'interests' && <Interests db={ filteredDB }/> }
       </div>
     </div>
   )
