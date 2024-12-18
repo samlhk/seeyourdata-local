@@ -4,6 +4,5 @@ contextBridge.exposeInMainWorld('api', {
     readDB: () => ipcRenderer.invoke('read-db'),
     writeDB: (json) => ipcRenderer.invoke('write-db', json),
     getDBPath: () => ipcRenderer.invoke('get-db-path'),
-    ask: (query) => ipcRenderer.invoke('ask', query),
-    looadRag: () => ipcRenderer.invoke('load-rag')
+    ask: (query) => ipcRenderer.invoke('ask', query)
 })

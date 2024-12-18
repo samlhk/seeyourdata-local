@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import Activity from '../components/Activity';
-import Location from '../components/Location';
-import Interests from '../components/Interests';
+import Activity from '../components/activity/Activity';
+import Location from '../components/location/Location';
+import Interests from '../components/interests/Interests';
 import JSZip from 'jszip';
 import { FaInfoCircle } from "react-icons/fa";
 import { Tooltip } from 'react-tooltip'
@@ -206,8 +206,6 @@ const Home = () => {
           db.topics = topics;
         }
 
-        // update RAG model
-
       } catch(e) {
         console.error('Unexpected error processing file: ' + e.message);
       }
@@ -287,7 +285,7 @@ const Home = () => {
           </div>
           <div>
             <strong>Your data downloads</strong>
-            <a data-tooltip-id="downloads-info-tooltip" data-tooltip-content={`Useful info from your data downloads is parsed and stored in ${dbPath} and nowhere else`}>
+            <a data-tooltip-id="downloads-info-tooltip" data-tooltip-content={`Useful info from your data downloads is parsed and stored in ${dbPath},db.md and nowhere else`}>
               &nbsp;<sup><FaInfoCircle/></sup></a>
             <Tooltip id="downloads-info-tooltip" clickable />
             {downloadFiles.length > 0 ? <div>

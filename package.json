@@ -37,7 +37,7 @@
   },
   "main": "public/electron.js",
   "scripts": {
-    "start": "DISABLE_ESLINT_PLUGIN=true react-scripts start",
+    "start": "DISABLE_ESLINT_PLUGIN=false react-scripts start",
     "build": "NODE_ENV=prod react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",

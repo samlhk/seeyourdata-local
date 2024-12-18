@@ -2,6 +2,10 @@ h1 {
   padding: 0.5rem 2rem;
 }
 
+nav {
+  margin: 1rem;
+}
+
 .home-container {
   display: grid;
   grid-template-columns: 50% 50%;
@@ -50,9 +54,14 @@ li {
 
 .explore-more-bar {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
 }
 
 .explore-more-container:hover .explore-more-indicator {
   transform: scale(1.05);
+}
+
+.filter-bar {
+  display: flex;
+  justify-content: space-between;
 }

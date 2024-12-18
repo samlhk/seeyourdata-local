@@ -6,7 +6,6 @@ import 'bootstrap/dist/css/bootstrap.css';
 import './css/App.css';
 import './css/Page.css';
 import './css/Panel.css';
-import './css/FilterBar.css'
 
 
 function App() {

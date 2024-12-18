@@ -5,19 +5,19 @@ const fs = require('fs')
 let mPrompts, model, retriever;
 const setUpLLM = async () => {
   // TODO improve RAG
+  // const mJson = await import("langchain/document_loaders/fs/json");
+  // const loader = new mJson.JSONLoader(path.join(app.getPath('userData'), 'db.json'));
+  // const docs = await loader.load();
+
   mPrompts = await import("@langchain/core/prompts");
-  const mJson = await import("langchain/document_loaders/fs/json");
   const mText = await import("langchain/document_loaders/fs/text");
   const mTextSplitter = await import("langchain/text_splitter");
   const mMemory = await import("langchain/vectorstores/memory");
   const mHfTransformers = await import("@langchain/community/embeddings/hf_transformers");
-  const mRetrieval = await import("langchain/chains/retrieval");
-  const mCombineDocuments = await import("langchain/chains/combine_documents");
   const mLlamaCpp = await import("@langchain/community/llms/llama_cpp");
 
-  const loader = new mText.TextLoader(path.join(app.getPath('userData'), '1 copy.md'));
+  const loader = new mText.TextLoader(path.join(app.getPath('userData'), 'db.md'));
   const docs = await loader.load();
-
   const splitter = new mTextSplitter.MarkdownTextSplitter({
     chunkSize: 500,
     chunkOverlap: 0
@@ -64,6 +64,7 @@ app.on("ready", async () => {
   })
 
   ipcMain.handle('write-db', async (event, json) => {
+    // TODO process db.json -> db.md here with code regarding db.json's structure
     try {
       fs.writeFileSync(path.join(app.getPath('userData'), 'db.json'), JSON.stringify(json));
       return true;
@@ -76,10 +77,6 @@ app.on("ready", async () => {
     return path.join(app.getPath('userData'), 'db.json');
   })
 
-  ipcMain.handle('load-rag', async (event, arg) => {
-    return true;
-  })
-
   ipcMain.handle('ask', async (event, query) => {
     try {
       // const prompt = mPrompts.ChatPromptTemplate.fromTemplate(`You are an AI chatbot, please give an answer to the following question even if you are unsure: {input}`);
@@ -87,12 +84,14 @@ app.on("ready", async () => {
       // const result = await chain.invoke({ input: query });
       // return result;
 
-      const mRetrieval = await import("langchain/chains/retrieval");
-      const mCombineDocuments = await import("langchain/chains/combine_documents");
-      const prompt = mPrompts.ChatPromptTemplate.fromTemplate(`You are an AI chatbot that have read through a user's activity data in the context tags below, please answer their question based on their activity data in the context tags
+      const promptText = `You are an AI chatbot that have read through a user's activity data in the context tags below, please answer their question based on their activity data summary in the context tags
         <context>{context}</context>
         question: {input}
-      `);
+      `;
+
+      const mRetrieval = await import("langchain/chains/retrieval");
+      const mCombineDocuments = await import("langchain/chains/combine_documents");
+      const prompt = mPrompts.ChatPromptTemplate.fromTemplate(promptText);
       const documentChain = await mCombineDocuments.createStuffDocumentsChain({
         llm: model,
         prompt

@@ -1,16 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Chart } from 'chart.js/auto';
 import { Line } from "react-chartjs-2";
-import { useNavigate } from 'react-router-dom';
-import { FaLongArrowAltRight } from "react-icons/fa";
 
 
-const Activity = ({ db, isHome }) => {
+const ActivityTrend = ({ db, filterBar = true }) => {
 
-  const [timeRange, setTimeRange] = useState();
-  const [monthlyActivities, setMonthlyActivities] = useState();
-
-  const navigate = useNavigate();
+  const [timeRange, setTimeRange] = useState(null);
+  const [monthlyActivities, setMonthlyActivities] = useState(null);
+  const [filteredApps, setFilteredApps] = useState(new Set());
 
   const colors = [
     'rgba(255, 99, 132, 0.7)',
@@ -20,17 +17,18 @@ const Activity = ({ db, isHome }) => {
     'rgba(153, 102, 255, 0.7)',
   ]
   
-
   useEffect(() => {
-    renderActivity();
-  }, [db])
+    render();
+  }, [db, filteredApps])
 
-  const renderActivity = async () => {
+  const render = async () => {
     if (db && db.activity) {
       const top = 5;
       let earliest = new Date();
       db.activity.sort((item1, item2) => item2.timestamps.length - item1.timestamps.length);
-      let activities = db.activity.slice(0, top);
+      let activities = db.activity;
+      if (filteredApps.size > 0) activities = activities.filter(({app}) => filteredApps.has(app));
+      activities = activities.slice(0, top);
       activities = activities.map(({app, timestamps}) => {
         const record = {};
         for (const timestamp of timestamps) {
@@ -72,27 +70,26 @@ const Activity = ({ db, isHome }) => {
   }
 
   return (
-    isHome ? 
-      (monthlyActivities && timeRange ?
-        <div className='explore-more-container' onClick={ () => navigate('/activity') }>
-          <div className='explore-more-bar'>
-            <h4>Activity</h4>
-            <button className='explore-more-indicator'>Explore More <FaLongArrowAltRight/></button>
-          </div>
-          <Line data={{ labels: timeRange, datasets: monthlyActivities }}/>
-        </div> : <></>) :
+    monthlyActivities && timeRange ?
+    <div>
+      <h4>Activity</h4>
 
-      (monthlyActivities && timeRange ?
-        <>
-          <div>
-            <h4>Activity</h4>
-            <Line data={{ labels: timeRange, datasets: monthlyActivities }}/>
-          </div>
-          <div>Activity visualisation 2</div>
-        </> :
-      <></>
-      )
+      {filterBar && <div className='filter-bar'>
+        <div>View apps</div>
+        <select id='app-filter' defaultValue='all' disabled={filteredApps.size === 5}
+          onChange={(e) => {setFilteredApps(filteredApps.union(new Set([e.target.value])))}}>
+          <option disabled={true} defaultValue={true} value='all'>All apps</option>
+          { db.activity.map(({app}) => <option value={app}>{app}</option>) }
+        </select>
+        <button disabled={filteredApps.size === 0} onClick={() => {
+          setFilteredApps(new Set());
+          document.getElementById('app-filter').value = 'all';
+        }}>Clear Filter</button>
+      </div>}
+
+      <Line data={{ labels: timeRange, datasets: monthlyActivities }}/>
+    </div>: <></>
   )
 }
 
-export default Activity
+export default ActivityTrend
