@@ -6,6 +6,7 @@ import JSZip from 'jszip';
 import { FaInfoCircle } from "react-icons/fa";
 import { Tooltip } from 'react-tooltip'
 import Dialogue from '../components/Dialogue';
+import Instagram from '../components/instagram/Instagram';
 const { parse } = require('node-html-parser');
 const lda = require('lda');
 
@@ -88,11 +89,11 @@ const Home = () => {
         db.activity.find(activity => activity.app === app).timestamps = Array.from(set);
       }
 
-      const addInterestTexts = (source, texts) => {
-        if (!db.documents) db.documents = [];
-        if (!db.documents.find(document => document.source === source)) db.documents = db.documents.concat([{source, texts: []}]);
-        const set = new Set(db.documents.find(document => document.source === source).texts).union(new Set(texts));
-        db.documents.find(document => document.source === source).texts = Array.from(set);
+      const addPostedTexts = (source, texts) => {
+        if (!db.postedContent) db.postedContent = [];
+        if (!db.postedContent.find(content => content.source === source)) db.postedContent = db.postedContent.concat([{source, texts: []}]);
+        const set = new Set(db.postedContent.find(content => content.source === source).texts).union(new Set(texts));
+        db.postedContent.find(content => content.source === source).texts = Array.from(set);
       }
 
       try {
@@ -100,15 +101,67 @@ const Home = () => {
         // ---------------------------------
         // ------------Instagram------------
         // ---------------------------------
+
+        let instagramViewedAdsFile = zip.file('ads_information/ads_and_topics/ads_viewed.json') ||
+          zip.file(innerZipFolder + 'ads_information/ads_and_topics/ads_viewed.json');
+        if (instagramViewedAdsFile) {
+          console.log('Processing instagram viewed ads');
+          const data = await instagramViewedAdsFile.async('text');
+          const json = JSON.parse(data);
+          const timestamps = json.impressions_history_ads_seen.map(obj => new Date(obj.string_map_data.Time.timestamp * 1000).toString());
+          addActivity('instagram: ad views', timestamps);
+          const accounts = json.impressions_history_ads_seen.filter(obj => obj.string_map_data.Author).map(obj => obj.string_map_data.Author.value);
+          if (!db.instagramViewedAccounts) db.instagramViewedAccounts = {};
+          db.instagramViewedAccounts.ads = accounts;
+        }
+
+        let instagramViewedPostsFile = zip.file('ads_information/ads_and_topics/posts_viewed.json') ||
+          zip.file(innerZipFolder + 'ads_information/ads_and_topics/posts_viewed.json');
+        if (instagramViewedPostsFile) {
+          console.log('Processing instagram viewed posts');
+          const data = await instagramViewedPostsFile.async('text');
+          const json = JSON.parse(data);
+          const timestamps = json.impressions_history_posts_seen.map(obj => new Date(obj.string_map_data.Time.timestamp * 1000).toString());
+          addActivity('instagram: post views', timestamps);
+          const accounts = json.impressions_history_posts_seen.filter(obj => obj.string_map_data.Author).map(obj => obj.string_map_data.Author.value);
+          if (!db.instagramViewedAccounts) db.instagramViewedAccounts = {};
+          db.instagramViewedAccounts.posts = accounts;
+        }
+
+        let instagramViewedSuggestedProfilesFile = zip.file('ads_information/ads_and_topics/suggested_profiles_viewed.json') ||
+          zip.file(innerZipFolder + 'ads_information/ads_and_topics/suggested_profiles_viewed.json');
+        if (instagramViewedSuggestedProfilesFile) {
+          console.log('Processing instagram viewed suggested profiles');
+          const data = await instagramViewedSuggestedProfilesFile.async('text');
+          const json = JSON.parse(data);
+          const timestamps = json.impressions_history_chaining_seen.map(obj => new Date(obj.string_map_data.Time.timestamp * 1000).toString());
+          addActivity('instagram: suggested profile views', timestamps);
+          const accounts = json.impressions_history_chaining_seen.filter(obj => obj.string_map_data.Username).map(obj => obj.string_map_data.Username.value);
+          if (!db.instagramViewedAccounts) db.instagramViewedAccounts = {};
+          db.instagramViewedAccounts.suggestedProfiles = accounts;
+        }
+
+        let instagramViewedVideosFile = zip.file('ads_information/ads_and_topics/videos_watched.json') ||
+          zip.file(innerZipFolder + 'ads_information/ads_and_topics/videos_watched.json');
+        if (instagramViewedVideosFile) {
+          console.log('Processing instagram viewed videos');
+          const data = await instagramViewedVideosFile.async('text');
+          const json = JSON.parse(data);
+          const timestamps = json.impressions_history_videos_watched.map(obj => new Date(obj.string_map_data.Time.timestamp * 1000).toString());
+          addActivity('instagram: video views', timestamps);
+          const accounts = json.impressions_history_videos_watched.filter(obj => obj.string_map_data.Author).map(obj => obj.string_map_data.Author.value);
+          if (!db.instagramViewedAccounts) db.instagramViewedAccounts = {};
+          db.instagramViewedAccounts.videos = accounts;
+        }
         
         let instagramActivityFile = zip.file('security_and_login_information/login_and_profile_creation/login_activity.json') ||
           zip.file(innerZipFolder + 'security_and_login_information/login_and_profile_creation/login_activity.json');
         if (instagramActivityFile) {
-          console.log('Processing instagram activity');
+          console.log('Processing instagram log in activity');
           const data = await instagramActivityFile.async('text');
           const json = JSON.parse(data);
           const timestamps = json.account_history_login_history.map(({ title }) => title);
-          addActivity('instagram', timestamps);
+          addActivity('instagram: log in', timestamps);
         }
 
         let instagramOffMetaActivityFile = zip.file('apps_and_websites_off_of_instagram/apps_and_websites/your_activity_off_meta_technologies.json') ||
@@ -129,8 +182,13 @@ const Home = () => {
           console.log(`Processing instagram post comments`);
           const data = await instagramPostCommentsFile.async('text');
           const json = JSON.parse(data);
+          const timestamps = json.map(obj => new Date(obj.string_map_data.Time.timestamp * 1000).toString());
+          addActivity('instagram: post comments', timestamps);
           const comments = json.map(obj => obj.string_map_data?.Comment?.value);
-          addInterestTexts('instagram posts', comments);
+          addPostedTexts('instagram post comments', comments);
+          const accounts = json.filter(obj => obj.string_map_data['Media Owner']).map(obj => obj.string_map_data['Media Owner'].value);
+          if (!db.instagramCommentedAccounts) db.instagramCommentedAccounts = {};
+          db.instagramCommentedAccounts.posts = accounts;
         }
 
         let instagramReelsCommentsFile = zip.file('your_instagram_activity/comments/reels_comments.json') ||
@@ -139,8 +197,13 @@ const Home = () => {
           console.log(`Processing instagram reels comments`);
           const data = await instagramReelsCommentsFile.async('text');
           const json = JSON.parse(data);
+          const timestamps = json.comments_reels_comments.map(obj => new Date(obj.string_map_data.Time.timestamp * 1000).toString());
+          addActivity('instagram: reel comments', timestamps);
           const comments = json.comments_reels_comments.map(obj => obj.string_map_data?.Comment?.value);
-          addInterestTexts('instagram reels', comments);
+          addPostedTexts('instagram reel comments', comments);
+          const accounts = json.comments_reels_comments.filter(obj => obj.string_map_data['Media Owner']).map(obj => obj.string_map_data['Media Owner'].value);
+          if (!db.instagramCommentedAccounts) db.instagramCommentedAccounts = {};
+          db.instagramCommentedAccounts.reels = accounts;
         }
 
 
@@ -151,6 +214,7 @@ const Home = () => {
         let googleMapsFile = zip.file('Takeout/My Activity/Maps/My Activity.html') || 
           zip.file(innerZipFolder + 'Takeout/My Activity/Maps/My Activity.html');
         if (googleMapsFile) {
+          // TODO add access timestamps to activity and google
           console.log('Processing google maps');
           const data = await googleMapsFile.async('text');
           const root = parse(data);
@@ -171,39 +235,39 @@ const Home = () => {
           db.location = Array.from(set);
         }
 
-        // // loop example
-        // const instagramCommentsFiles = [];
-        // zip.folder('your_instagram_activity/comments')
-        //   .forEach((relativePath, file) => {instagramCommentsFiles.push(file.name);});
-        // zip.folder(innerZipFolder + 'your_instagram_activity/comments')
-        //   .forEach((relativePath, file) => {instagramCommentsFiles.push(file.name);});
-        // for await (const file of instagramCommentsFiles) {
-        //   console.log(`Processing instagram comments in file: ${file}`);
-        //   const data = await zip.file(file).async('text');
-        //   const root = parse(data);
-        //   const commentElements = root.querySelectorAll('._2pin._a6_q').filter(element => element.innerText.includes('Comment'));
-        //   const comments = commentElements.map(element => element.innerText.replace('Comment', ''));
+        // loop example
+        const instagramCommentsFiles = [];
+        zip.folder('your_instagram_activity/comments')
+          .forEach((relativePath, file) => {instagramCommentsFiles.push(file.name);});
+        zip.folder(innerZipFolder + 'your_instagram_activity/comments')
+          .forEach((relativePath, file) => {instagramCommentsFiles.push(file.name);});
+        for await (const file of instagramCommentsFiles) {
+          console.log(`Processing instagram comments in file: ${file}`);
+          const data = await zip.file(file).async('text');
+          const root = parse(data);
+          const commentElements = root.querySelectorAll('._2pin._a6_q').filter(element => element.innerText.includes('Comment'));
+          const comments = commentElements.map(element => element.innerText.replace('Comment', ''));
 
-        //   if (!db.documents) db.documents = [];
-        //   if (db.documents.filter(document => document.source === `instagram.${file}`).length === 0) db.documents = db.documents.concat([{source: `instagram.${file}`, texts: []}]);
-        //   const set = new Set(db.documents.filter(document => document.source === `instagram.${file}`)[0].texts).union(new Set(comments));
-        //   db.documents.filter(document => document.source === `instagram.${file}`)[0].texts = Array.from(set);
-        // }
+          if (!db.documents) db.documents = [];
+          if (db.documents.filter(document => document.source === `instagram.${file}`).length === 0) db.documents = db.documents.concat([{source: `instagram.${file}`, texts: []}]);
+          const set = new Set(db.documents.filter(document => document.source === `instagram.${file}`)[0].texts).union(new Set(comments));
+          db.documents.filter(document => document.source === `instagram.${file}`)[0].texts = Array.from(set);
+        }
         
         // ---------------------------------
         // ------------Misc-----------------
         // ---------------------------------
 
         // update topic model
-        if (instagramPostCommentsFile || instagramReelsCommentsFile) {
-          console.log(`Updating topic model`);
-          const document = db.documents.reduce((allText, obj) => allText.concat(obj.texts), []);
+        if (db.postedContent) {
+          console.log(`Updating posted topics`);
+          const document = db.postedContent.reduce((allText, obj) => allText.concat(obj.texts), []);
           const numberOfTopics = 10;
           const topics = new lda(document, numberOfTopics, 5).map((topic, id) => {
             const arr = topic.map(({ term }) => ({ topic: term, weight: numberOfTopics - id}));
             return arr;
           }).flat();
-          db.topics = topics;
+          db.postedTopics = topics;
         }
 
       } catch(e) {
@@ -301,9 +365,8 @@ const Home = () => {
         <Dialogue db={ db } isHome={ true }/>
         <Location db={ db } isHome={ true }/>
         <Interests db={ db } isHome={ true }/>
+        <Instagram db={ db } isHome={ true }/>
         <div>Google</div>
-        <div>Instagram</div>
-        <div>Dialogue</div>
       </div>
     </div>
   )

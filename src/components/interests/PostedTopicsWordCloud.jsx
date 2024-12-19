@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ReactWordCloud from 'react-wordcloud';
 
-const InterestsWordCloud = ({ db }) => {
+const PostedTopicsWordCloud = ({ db }) => {
   
   const [topics, setTopics] = useState();
 
@@ -10,8 +10,8 @@ const InterestsWordCloud = ({ db }) => {
   }, [db])
 
   const render = async () => {
-    if (db && db.topics) {
-      setTopics(db.topics
+    if (db && db.postedTopics) {
+      setTopics(db.postedTopics
         .map(({ topic, weight }) => topic.split(' ').map(text => ({ text, value: weight })))
         .reduce((allWords, words) => allWords.concat(words), []));
     } else {
@@ -22,7 +22,7 @@ const InterestsWordCloud = ({ db }) => {
   return (
     topics ?
     <div className='interests-container'>
-      <h4>Interests</h4>
+      <h4>Topics from posted content</h4>
       <ReactWordCloud 
         words={topics}
         options={{rotations: 1, rotationAngles: [0, 0]}} />
@@ -30,4 +30,4 @@ const InterestsWordCloud = ({ db }) => {
   )
 }
 
-export default InterestsWordCloud
+export default PostedTopicsWordCloud

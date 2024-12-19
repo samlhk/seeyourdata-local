@@ -1,7 +1,7 @@
 import React from 'react';
 import { FaLongArrowAltRight } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import InterestsWordCloud from './InterestsWordCloud';
+import PostedTopicsWordCloud from './PostedTopicsWordCloud';
 
 const Interests = ({ db, isHome }) => {
 
@@ -9,15 +9,15 @@ const Interests = ({ db, isHome }) => {
 
   return (
     isHome ?
-      (db.documents ?
+      (db.postedTopics ?
         <div className='explore-more-container' onClick={ () => navigate('/interests') }>
           <div className='explore-more-bar'>
             <button className='explore-more-indicator'>Explore More <FaLongArrowAltRight/></button>
           </div>
-          <InterestsWordCloud db={ db }/>
+          <PostedTopicsWordCloud db={ db }/>
         </div> : <></>) :
       <>
-        <InterestsWordCloud db={ db }/>
+        <PostedTopicsWordCloud db={ db }/>
         <div>Interests visualisation 2</div>
       </>
   )

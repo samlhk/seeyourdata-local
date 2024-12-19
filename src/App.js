@@ -16,6 +16,7 @@ function App() {
           <Route path='/activity' element={ <Page category='activity'/> }/>
           <Route path='/interests' element={ <Page category='interests'/> }/>
           <Route path='/location' element={ <Page category='location'/> }/>
+          <Route path='/instagram' element={ <Page category='instagram'/> }/>
       </Routes>
     </Router>
   );

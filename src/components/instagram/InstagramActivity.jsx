@@ -3,32 +3,33 @@ import { Chart } from 'chart.js/auto';
 import { Line } from "react-chartjs-2";
 
 
-const ActivityTrend = ({ db, filterBar = true }) => {
+const InstagramActivity = ({ db, filterBar = true }) => {
 
   const [timeRange, setTimeRange] = useState(null);
   const [monthlyActivities, setMonthlyActivities] = useState(null);
-  const [filteredApps, setFilteredApps] = useState(new Set());
+  const [filteredActivities, setFilteredActivities] = useState(new Set());
 
   const colors = [
-    'rgba(255, 99, 132, 1)',
-    'rgba(75, 192, 192, 1)',
-    'rgba(255, 205, 86, 1)',
-    'rgba(54, 162, 235, 1)',
-    'rgba(153, 102, 255, 1)',
+    'rgba(255, 0, 0, 1)',
+    'rgba(0, 128, 0, 1)',
+    'rgba(255, 165, 0, 1)',
+    'rgba(0, 0, 255, 1)',
+    'rgba(128, 0, 128, 1)',
+    'yellow',
+    'pink'
   ]
   
   useEffect(() => {
     render();
-  }, [db, filteredApps])
+  }, [db, filteredActivities])
 
   const render = async () => {
     if (db && db.activity) {
-      const top = 5;
       let earliest = new Date();
       db.activity.sort((item1, item2) => item2.timestamps.length - item1.timestamps.length);
       let activities = db.activity;
-      if (filteredApps.size > 0) activities = activities.filter(({app}) => filteredApps.has(app));
-      activities = activities.slice(0, top);
+      activities = activities.filter(({app}) => app.includes('instagram: '));
+      if (filteredActivities.size > 0) activities = activities.filter(({app}) => filteredActivities.has(app.replace('instagram: ', '')));
       activities = activities.map(({app, timestamps}) => {
         const record = {};
         for (const timestamp of timestamps) {
@@ -41,7 +42,7 @@ const ActivityTrend = ({ db, filterBar = true }) => {
             record[monthYear] = 1;
           }
         }
-        return { app, record };
+        return { app: app.replace('instagram: ', ''), record };
       })
       const months = [];
       activities = activities.map(({app, record}, index) => {
@@ -72,18 +73,18 @@ const ActivityTrend = ({ db, filterBar = true }) => {
   return (
     monthlyActivities && timeRange ?
     <div>
-      <h4>Activity</h4>
+      <h4>Instagram Activity</h4>
 
       {filterBar && <div className='filter-bar'>
-        <div>View apps</div>
-        <select id='app-filter' defaultValue='all' disabled={filteredApps.size === 5}
-          onChange={(e) => {setFilteredApps(filteredApps.union(new Set([e.target.value])))}}>
-          <option disabled={true} defaultValue={true} value='all'>All apps</option>
-          { db.activity.sort((a, b) => a.app.toLowerCase().localeCompare(b.app.toLowerCase())).map(({app}) => <option value={app}>{app}</option>) }
+        <div>View activities</div>
+        <select id='activity-filter' defaultValue='all'
+          onChange={(e) => {setFilteredActivities(filteredActivities.union(new Set([e.target.value])))}}>
+          <option disabled={true} defaultValue={true} value='all'>All activities</option>
+          { db.activity.filter(({app}) => app.includes('instagram: ')).map(activity => ({...activity, app: activity.app.replace('instagram: ', '')})).sort((a, b) => a.app.toLowerCase().localeCompare(b.app.toLowerCase())).map(({app}) => <option value={app}>{app}</option>) }
         </select>
-        <button disabled={filteredApps.size === 0} onClick={() => {
-          setFilteredApps(new Set());
-          document.getElementById('app-filter').value = 'all';
+        <button disabled={filteredActivities.size === 0} onClick={() => {
+          setFilteredActivities(new Set());
+          document.getElementById('activity-filter').value = 'all';
         }}>Clear Filter</button>
       </div>}
 
@@ -92,4 +93,4 @@ const ActivityTrend = ({ db, filterBar = true }) => {
   )
 }
 
-export default ActivityTrend
+export default InstagramActivity

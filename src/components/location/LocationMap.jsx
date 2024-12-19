@@ -39,7 +39,7 @@ const LocationMap = ( { db, filterBar = true }) => {
         <select id='source-filter' defaultValue='all'
           onChange={(e) => {setFilteredSources(filteredSources.union(new Set([e.target.value])))}}>
           <option disabled={true} defaultValue={true} value='all'>All sources</option>
-          { [...new Set(db.location.map(({source}) => source))].map(source => <option value={source}>{source}</option>) }
+          { [...new Set(db.location.map(({source}) => source))].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())).map(source => <option value={source}>{source}</option>) }
         </select>
         <button disabled={filteredSources.size === 0} onClick={() => {
           setFilteredSources(new Set());
