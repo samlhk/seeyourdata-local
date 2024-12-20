@@ -1,6 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
-const path = require('path')
-const fs = require('fs')
+const path = require('path');
+const fs = require('fs');
 
 let mPrompts, model, retriever;
 const setUpLLM = async () => {
@@ -75,6 +75,19 @@ app.on("ready", async () => {
 
   ipcMain.handle('get-db-path', async (event, arg) => {
     return path.join(app.getPath('userData'), 'db.json');
+  })
+
+  ipcMain.handle('ips-to-latlong', async (event, ips) => {
+    try {
+      const maxmind = await import('maxmind');
+      const lookup = await maxmind.open(path.join(__dirname, "models", "GeoLite2-City.mmdb"));
+      return ips.map(ip => {
+        const location = lookup.get(ip);
+        return `${location.location.latitude},${location.location.longitude}`
+      });
+    } catch (err) {
+      console.error(err);
+    }
   })
 
   ipcMain.handle('ask', async (event, query) => {

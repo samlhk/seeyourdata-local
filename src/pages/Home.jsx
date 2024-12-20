@@ -7,6 +7,7 @@ import { FaInfoCircle } from "react-icons/fa";
 import { Tooltip } from 'react-tooltip'
 import Dialogue from '../components/Dialogue';
 import Instagram from '../components/instagram/Instagram';
+import Pi from '../components/pi/Pi';
 const { parse } = require('node-html-parser');
 const lda = require('lda');
 
@@ -89,11 +90,59 @@ const Home = () => {
         db.activity.find(activity => activity.app === app).timestamps = Array.from(set);
       }
 
+      const addLocations = (locations) => {
+        if (!db.location) db.location = [];
+        const set = new Set(db.location).union(new Set(locations));
+        db.location = Array.from(set);
+      }
+
       const addPostedTexts = (source, texts) => {
         if (!db.postedContent) db.postedContent = [];
         if (!db.postedContent.find(content => content.source === source)) db.postedContent = db.postedContent.concat([{source, texts: []}]);
         const set = new Set(db.postedContent.find(content => content.source === source).texts).union(new Set(texts));
         db.postedContent.find(content => content.source === source).texts = Array.from(set);
+      }
+
+      const addAdvertisers = (source, advertisers) => {
+        if (!db.advertisers) db.advertisers = [];
+        if (!db.advertisers.find(advertisers => advertisers.source === source)) db.advertisers = db.advertisers.concat([{source, advertisers: []}]);
+        const set = new Set(db.advertisers.find(advertisers => advertisers.source === source).advertisers).union(new Set(advertisers));
+        db.advertisers.find(advertisers => advertisers.source === source).advertisers = Array.from(set);
+      }
+
+      const addRecommendedTopics = (source, topics) => {
+        if (!db.recommendedTopics) db.recommendedTopics = [];
+        if (!db.recommendedTopics.find(topics => topics.source === source)) db.recommendedTopics = db.recommendedTopics.concat([{source, topics: []}]);
+        const set = new Set(db.recommendedTopics.find(topics => topics.source === source).topics).union(new Set(topics));
+        db.recommendedTopics.find(topics => topics.source === source).topics = Array.from(set);
+      }
+
+      const addPhone = (source, phone) => {
+        if (!db.piPhone) db.piPhone = [];
+        if (!db.piPhone.find(phone => phone.source === source)) db.piPhone = db.piPhone.concat([{source, phone: []}]);
+        const set = new Set(db.piPhone.find(phone => phone.source === source).phone).union(new Set(phone));
+        db.piPhone.find(phone => phone.source === source).phone = Array.from(set);
+      }
+
+      const addLocation = (source, location) => {
+        if (!db.piLocation) db.piLocation = [];
+        if (!db.piLocation.find(location => location.source === source)) db.piLocation = db.piLocation.concat([{source, location: []}]);
+        const set = new Set(db.piLocation.find(location => location.source === source).location).union(new Set(location));
+        db.piLocation.find(location => location.source === source).location = Array.from(set);
+      }
+
+      const addIp = (source, ip) => {
+        if (!db.piIp) db.piIp = [];
+        if (!db.piIp.find(ip => ip.source === source)) db.piIp = db.piIp.concat([{source, ip: []}]);
+        const set = new Set(db.piIp.find(ip => ip.source === source).ip).union(new Set(ip));
+        db.piIp.find(ip => ip.source === source).ip = Array.from(set);
+      }
+
+      const addDevice = (source, device) => {
+        if (!db.piDevice) db.piDevice = [];
+        if (!db.piDevice.find(device => device.source === source)) db.piDevice = db.piDevice.concat([{source, device: []}]);
+        const set = new Set(db.piDevice.find(device => device.source === source).device).union(new Set(device));
+        db.piDevice.find(device => device.source === source).device = Array.from(set);
       }
 
       try {
@@ -153,15 +202,52 @@ const Home = () => {
           if (!db.instagramViewedAccounts) db.instagramViewedAccounts = {};
           db.instagramViewedAccounts.videos = accounts;
         }
-        
-        let instagramActivityFile = zip.file('security_and_login_information/login_and_profile_creation/login_activity.json') ||
-          zip.file(innerZipFolder + 'security_and_login_information/login_and_profile_creation/login_activity.json');
-        if (instagramActivityFile) {
-          console.log('Processing instagram log in activity');
-          const data = await instagramActivityFile.async('text');
+
+        let instagramAdvertisersFile = zip.file('ads_information/instagram_ads_and_businesses/advertisers_using_your_activity_or_information.json') ||
+          zip.file(innerZipFolder + 'ads_information/instagram_ads_and_businesses/advertisers_using_your_activity_or_information.json');
+        if (instagramAdvertisersFile) {
+          console.log('Processing instagram advertisers');
+          const data = await instagramAdvertisersFile.async('text');
           const json = JSON.parse(data);
-          const timestamps = json.account_history_login_history.map(({ title }) => title);
-          addActivity('instagram: log in', timestamps);
+          const advertisers = json.ig_custom_audiences_all_types.map(obj => obj.advertiser_name);
+          addAdvertisers('instagram', advertisers);
+        }
+
+        let instagramPhoneFile = zip.file('personal_information/information_about_you/possible_phone_numbers.json') ||
+          zip.file(innerZipFolder + 'personal_information/information_about_you/possible_phone_numbers.json');
+        if (instagramPhoneFile) {
+          console.log('Processing instagram phone number');
+          const data = await instagramPhoneFile.async('text');
+          const json = JSON.parse(data);
+          const phones = [];
+          if (json.inferred_data_inferred_phone_numbers) {
+            json.inferred_data_inferred_phone_numbers.forEach(obj => {
+              if (obj && obj.string_list_data) { obj.string_list_data.forEach(obj => { if (obj && obj.value) {
+                phones.push(obj.value);}})}})}
+          if (phones.length > 0) addPhone('instagram', phones);
+        }
+
+        let instagramLocationFile = zip.file('personal_information/information_about_you/profile_based_in.json') ||
+          zip.file(innerZipFolder + 'personal_information/information_about_you/profile_based_in.json');
+        if (instagramLocationFile) {
+          console.log('Processing instagram location');
+          const data = await instagramLocationFile.async('text');
+          const json = JSON.parse(data);
+          const locations = [];
+          if (json.inferred_data_primary_location) { json.inferred_data_primary_location.forEach((obj) => {
+              if (obj && obj.string_map_data?.['Town/city name']) { 
+                locations.push(obj.string_map_data['Town/city name'].value);}})}
+          if (locations.length > 0) addLocation('instagram', locations);
+        }
+
+        let instagramRecommendedTopicsFile = zip.file('preferences/your_topics/recommended_topics.json') ||
+          zip.file(innerZipFolder + 'preferences/your_topics/recommended_topics.json');
+        if (instagramRecommendedTopicsFile) {
+          console.log('Processing instagram recommended topics');
+          const data = await instagramRecommendedTopicsFile.async('text');
+          const json = JSON.parse(data);
+          const topics = json.topics_your_topics.map(obj => obj.string_map_data.Name.value);
+          addRecommendedTopics('instagram', topics);
         }
 
         let instagramOffMetaActivityFile = zip.file('apps_and_websites_off_of_instagram/apps_and_websites/your_activity_off_meta_technologies.json') ||
@@ -175,6 +261,27 @@ const Home = () => {
             addActivity(name, timestamps);
           })
         };
+
+        let instagramActivityFile = zip.file('security_and_login_information/login_and_profile_creation/login_activity.json') ||
+          zip.file(innerZipFolder + 'security_and_login_information/login_and_profile_creation/login_activity.json');
+        if (instagramActivityFile) {
+          console.log('Processing instagram log in activity');
+          const data = await instagramActivityFile.async('text');
+          const json = JSON.parse(data);
+          const timestamps = json.account_history_login_history.map(({ title }) => title);
+          addActivity('instagram: log in', timestamps);
+          const ips = json.account_history_login_history.map(obj => obj.string_map_data['IP address'].value);
+          const latlongs = await window.api.ipsToLatlong(ips);
+          const locations = latlongs.map((latlong, index) => ({
+              latlong,
+              label: ips[index],
+              source: 'Instagram log in'
+            }))
+          addLocations(locations);
+          addIp('instagram', ips);
+          const devices = json.account_history_login_history.map(obj => obj.string_map_data['User agent'].value);
+          addDevice('instagram', devices);
+        }
 
         let instagramPostCommentsFile = zip.file('your_instagram_activity/comments/post_comments_1.json') ||
           zip.file(innerZipFolder + 'your_instagram_activity/comments/post_comments_1.json');
@@ -230,9 +337,7 @@ const Home = () => {
               })
             }
           })
-          if (!db.location) db.location = [];
-          const set = new Set(db.location).union(new Set(locations));
-          db.location = Array.from(set);
+          addLocations(locations);
         }
 
         // loop example
@@ -365,6 +470,7 @@ const Home = () => {
         <Dialogue db={ db } isHome={ true }/>
         <Location db={ db } isHome={ true }/>
         <Interests db={ db } isHome={ true }/>
+        <Pi db={ db } isHome={ true }/>
         <Instagram db={ db } isHome={ true }/>
         <div>Google</div>
       </div>

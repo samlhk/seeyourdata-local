@@ -19,6 +19,7 @@ const Activity = ({ db, isHome }) => {
         </div>: <></>) :
       <>
         <ActivityTrend db = { db }/>
+        <div>TODO activity heatmap</div>
         <div>Activity visualisation 2</div>
       </>
   )

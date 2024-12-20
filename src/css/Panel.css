@@ -9,6 +9,15 @@
     max-height: 50vh;
 }
 
+/* Pi */
+table {
+    width: 100%;
+}
+
+td {
+    border: solid 1px black;
+}
+
 /* Dialogue */
 .dialogue-container {
     display: flex;

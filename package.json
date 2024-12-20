@@ -17,6 +17,7 @@
     "lda": "^0.2.0",
     "leaflet": "^1.9.4",
     "marked": "^15.0.3",
+    "maxmind": "^4.3.23",
     "node-html-parser": "^6.1.13",
     "node-llama-cpp": "^2.8.5",
     "path": "^0.12.7",
@@ -30,7 +31,8 @@
     "react-scripts": "5.0.1",
     "react-tooltip": "^5.28.0",
     "react-wordcloud": "^1.2.7",
-    "snowball": "^0.3.1"
+    "snowball": "^0.3.1",
+    "underscore": "^1.13.7"
   },
   "overrides": {
     "@langchain/core": "^0.1.18"
