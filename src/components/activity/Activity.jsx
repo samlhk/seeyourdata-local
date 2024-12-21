@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaLongArrowAltRight } from "react-icons/fa";
 import ActivityTrend from './ActivityTrend';
+import ActivityHeatMap from './ActivityHeatMap';
 
 
 const Activity = ({ db, isHome }) => {
@@ -19,7 +20,7 @@ const Activity = ({ db, isHome }) => {
         </div>: <></>) :
       <>
         <ActivityTrend db = { db }/>
-        <div>TODO activity heatmap</div>
+        <ActivityHeatMap db = { db }/>
         <div>Activity visualisation 2</div>
       </>
   )
