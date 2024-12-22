@@ -10,6 +10,7 @@ import './css/Panel.css';
 
 function App() {
   return (
+    // TODO colour scheme
     <Router>
       <Routes>
           <Route path='/' element={ <Home/> }/>
