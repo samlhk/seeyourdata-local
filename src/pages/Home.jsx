@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import Activity from '../components/activity/Activity';
 import Location from '../components/location/Location';
 import Interests from '../components/interests/Interests';
-// TODO decode unicode (chinese characters)
 import JSZip from 'jszip';
 import { FaInfoCircle } from "react-icons/fa";
 import { Tooltip } from 'react-tooltip'
@@ -86,10 +85,17 @@ const Home = () => {
       // ---------------------------------
       // ------------Utilities------------
       // ---------------------------------
+
+      // counter a double encoding issue with json and unicode, should be applied to all textual output
+      const encodeUnicode = (str) => { return decodeURIComponent(escape(str)); }
+      const encodeUnicodes = (lst) => { return lst.map(str => decodeURIComponent(escape(str))); }
+
       // TODO big refactor
       // Activity
       
       const addActivity = (app, timestamps) => {
+        app = encodeUnicode(app);
+        timestamps = encodeUnicodes(timestamps);
         if (!db.activity) db.activity = [];
         if (!db.activity.find(activity => activity.app === app)) db.activity = db.activity.concat([{app, timestamps: []}]);
         const set = new Set(db.activity.find(activity => activity.app === app).timestamps).union(new Set(timestamps));
@@ -99,6 +105,7 @@ const Home = () => {
       // Location
       
       const addLocations = (locations) => {
+        locations = locations.map(obj => ({...obj, label: encodeUnicode(obj.label)}))
         if (!db.location) db.location = [];
         const set = new Set(db.location).union(new Set(locations));
         db.location = Array.from(set);
@@ -107,6 +114,8 @@ const Home = () => {
       // Interests
       
       const addPostedTexts = (source, texts) => {
+        source = encodeUnicode(source);
+        texts = encodeUnicodes(texts);
         if (!db.postedContent) db.postedContent = [];
         if (!db.postedContent.find(content => content.source === source)) db.postedContent = db.postedContent.concat([{source, texts: []}]);
         const set = new Set(db.postedContent.find(content => content.source === source).texts).union(new Set(texts));
@@ -114,6 +123,8 @@ const Home = () => {
       }
 
       const addMessagedTexts = (source, texts) => {
+        source = encodeUnicode(source);
+        texts = encodeUnicodes(texts);
         if (!db.messagedContent) db.messagedContent = [];
         if (!db.messagedContent.find(content => content.source === source)) db.messagedContent = db.messagedContent.concat([{source, texts: []}]);
         const set = new Set(db.messagedContent.find(content => content.source === source).texts).union(new Set(texts));
@@ -121,6 +132,8 @@ const Home = () => {
       }
 
       const addAdvertisers = (source, advertisers) => {
+        source = encodeUnicode(source);
+        advertisers = encodeUnicodes(advertisers);
         if (!db.advertisers) db.advertisers = [];
         if (!db.advertisers.find(advertisers => advertisers.source === source)) db.advertisers = db.advertisers.concat([{source, advertisers: []}]);
         const set = new Set(db.advertisers.find(advertisers => advertisers.source === source).advertisers).union(new Set(advertisers));
@@ -128,6 +141,8 @@ const Home = () => {
       }
 
       const addRecommendedTopics = (source, topics) => {
+        source = encodeUnicode(source);
+        topics = encodeUnicodes(topics);
         if (!db.recommendedTopics) db.recommendedTopics = [];
         if (!db.recommendedTopics.find(topics => topics.source === source)) db.recommendedTopics = db.recommendedTopics.concat([{source, topics: []}]);
         const set = new Set(db.recommendedTopics.find(topics => topics.source === source).topics).union(new Set(topics));
@@ -293,7 +308,7 @@ const Home = () => {
           const json = JSON.parse(data);
           const timestamps = json.account_history_login_history.map(({ title }) => title);
           addActivity('instagram: log in', timestamps);
-          const ips = json.account_history_login_history.map(obj => obj.string_map_data['IP address'].value);
+          const ips = json.account_history_login_history.map(obj => obj.string_map_data['IP Address'].value);
           const latlongs = await window.api.ipsToLatlong(ips);
           const locations = latlongs.map((latlong, index) => ({
               latlong,
@@ -302,7 +317,7 @@ const Home = () => {
             }))
           addLocations(locations);
           addIp('instagram', ips);
-          const devices = json.account_history_login_history.map(obj => obj.string_map_data['User agent'].value);
+          const devices = json.account_history_login_history.map(obj => obj.string_map_data['User Agent'].value);
           addDevice('instagram', devices);
         }
 
@@ -489,7 +504,7 @@ const Home = () => {
         if (db.postedContent) {
           console.log(`Updating posted topics`);
           const document = db.postedContent.reduce((allText, obj) => allText.concat(obj.texts), []);
-          const numberOfTopics = 10;
+          const numberOfTopics = 20;
           const topics = new lda(document, numberOfTopics, 5).map((topic, id) => {
             const arr = topic.map(({ term }) => ({ topic: term, weight: numberOfTopics - id}));
             return arr;
@@ -500,7 +515,7 @@ const Home = () => {
         if (db.messagedContent) {
           console.log(`Updating messaged topics`);
           const document = db.messagedContent.reduce((allText, obj) => allText.concat(obj.texts), []);
-          const numberOfTopics = 10;
+          const numberOfTopics = 20;
           const topics = new lda(document, numberOfTopics, 5).map((topic, id) => {
             const arr = topic.map(({ term }) => ({ topic: term, weight: numberOfTopics - id}));
             return arr;
