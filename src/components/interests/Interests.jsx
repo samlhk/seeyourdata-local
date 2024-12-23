@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import PostedTopicsWordCloud from './PostedTopicsWordCloud';
 import AdvertisersWordCloud from './AdvertisersWordCloud';
 import RecommendedTopicsWordCloud from './RecommendedTopicsWordCloud';
+import MessagedTopicsWordCloud from './MessagedTopicsWordCloud';
 
 const Interests = ({ db, isHome }) => {
 
@@ -20,6 +21,7 @@ const Interests = ({ db, isHome }) => {
         </div> : <></>) :
       <>
         <PostedTopicsWordCloud db = { db }/>
+        <MessagedTopicsWordCloud db = { db }/>
         <AdvertisersWordCloud db = { db }/>
         <RecommendedTopicsWordCloud db = { db }/>
         <div>Interests visualisation 2</div>

@@ -15,6 +15,8 @@ const ActivityTrend = ({ db, filterBar = true }) => {
     'rgba(255, 205, 86, 1)',
     'rgba(54, 162, 235, 1)',
     'rgba(153, 102, 255, 1)',
+    'darkgreen',
+    'brown'
   ]
   
   useEffect(() => {
@@ -23,10 +25,11 @@ const ActivityTrend = ({ db, filterBar = true }) => {
 
   const render = async () => {
     if (db && db.activity) {
-      const top = 5;
+      const top = 7;
       let earliest = new Date();
       db.activity.sort((item1, item2) => item2.timestamps.length - item1.timestamps.length);
       let activities = db.activity;
+      activities = activities.filter(({app}) => !app.includes('instagram: chats with'));
       if (filteredApps.size > 0) activities = activities.filter(({app}) => filteredApps.has(app));
       activities = activities.slice(0, top);
       activities = activities.map(({app, timestamps}) => {
@@ -76,10 +79,10 @@ const ActivityTrend = ({ db, filterBar = true }) => {
 
       {filterBar && <div className='filter-bar'>
         <div>View apps</div>
-        <select id='app-filter' defaultValue='all' disabled={filteredApps.size === 5}
+        <select id='app-filter' defaultValue='all' disabled={filteredApps.size === 7}
           onChange={(e) => {setFilteredApps(filteredApps.union(new Set([e.target.value])))}}>
           <option disabled={true} defaultValue={true} value='all'>All apps</option>
-          { db.activity.sort((a, b) => a.app.toLowerCase().localeCompare(b.app.toLowerCase())).map(({app}) => <option value={app}>{app}</option>) }
+          { db.activity.filter(({app}) => !app.includes('instagram: chats with')).sort((a, b) => a.app.toLowerCase().localeCompare(b.app.toLowerCase())).map(({app}) => <option value={app}>{app}</option>) }
         </select>
         <button disabled={filteredApps.size === 0} onClick={() => {
           setFilteredApps(new Set());

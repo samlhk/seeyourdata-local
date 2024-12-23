@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Activity from '../components/activity/Activity';
 import Location from '../components/location/Location';
 import Interests from '../components/interests/Interests';
+// TODO decode unicode (chinese characters)
 import JSZip from 'jszip';
 import { FaInfoCircle } from "react-icons/fa";
 import { Tooltip } from 'react-tooltip'
@@ -85,7 +86,7 @@ const Home = () => {
       // ---------------------------------
       // ------------Utilities------------
       // ---------------------------------
-      
+      // TODO big refactor
       // Activity
       
       const addActivity = (app, timestamps) => {
@@ -110,6 +111,13 @@ const Home = () => {
         if (!db.postedContent.find(content => content.source === source)) db.postedContent = db.postedContent.concat([{source, texts: []}]);
         const set = new Set(db.postedContent.find(content => content.source === source).texts).union(new Set(texts));
         db.postedContent.find(content => content.source === source).texts = Array.from(set);
+      }
+
+      const addMessagedTexts = (source, texts) => {
+        if (!db.messagedContent) db.messagedContent = [];
+        if (!db.messagedContent.find(content => content.source === source)) db.messagedContent = db.messagedContent.concat([{source, texts: []}]);
+        const set = new Set(db.messagedContent.find(content => content.source === source).texts).union(new Set(texts));
+        db.messagedContent.find(content => content.source === source).texts = Array.from(set);
       }
 
       const addAdvertisers = (source, advertisers) => {
@@ -362,6 +370,28 @@ const Home = () => {
           addInstagram('LikedAccounts', 'stories', accounts);
         }
 
+        const instagramMessagesFiles = [];
+        zip.folder('your_instagram_activity/messages/inbox')
+          .forEach((relativePath, file) => {{if (relativePath.match(/\/message_1.json$/)) instagramMessagesFiles.push(file);}});
+        zip.folder(innerZipFolder + 'your_instagram_activity/messages/inbox')
+          .forEach((relativePath, file) => {{if (relativePath.match(/\/message_1.json$/)) instagramMessagesFiles.push(file);}});
+        let allMessageTimestamps = [];
+        for await (const file of instagramMessagesFiles) {
+          console.log(`Processing instagram messages in file: ${file.name}`);
+          const data = await file.async('text');
+          const json = JSON.parse(data);
+          const participants = json.participants;
+          if (participants.length < 2) continue;
+          const chatName = participants.length === 2 ? participants[0].name : `${file.name.match(/.+\/(.*)_\d*\/message_1.json$/).pop()} (group chat)`;
+          const you = participants[participants.length === 2 ? 1 : 0].name;
+          const timestamps = json.messages.map(obj => new Date(obj.timestamp_ms).toString());
+          allMessageTimestamps = allMessageTimestamps.concat(timestamps);
+          addActivity(`instagram: chats with ${chatName}`, timestamps);
+          const messages = json.messages.filter(obj => obj.sender_name === you).map(obj => obj.content);
+          addMessagedTexts('instagram messages', messages);
+        }
+        if (allMessageTimestamps.length > 0) addActivity('instagram: chats and messages', allMessageTimestamps);
+
         let instagramStoryEmojiSlidersFile = zip.file('your_instagram_activity/story_sticker_interactions/emoji_sliders.json') ||
           zip.file(innerZipFolder + 'your_instagram_activity/story_sticker_interactions/emoji_sliders.json');
         if (instagramStoryEmojiSlidersFile) {
@@ -447,31 +477,15 @@ const Home = () => {
           })
           addLocations(locations);
         }
-
-        // loop example
-        const instagramCommentsFiles = [];
-        zip.folder('your_instagram_activity/comments')
-          .forEach((relativePath, file) => {instagramCommentsFiles.push(file.name);});
-        zip.folder(innerZipFolder + 'your_instagram_activity/comments')
-          .forEach((relativePath, file) => {instagramCommentsFiles.push(file.name);});
-        for await (const file of instagramCommentsFiles) {
-          console.log(`Processing instagram comments in file: ${file}`);
-          const data = await zip.file(file).async('text');
-          const root = parse(data);
-          const commentElements = root.querySelectorAll('._2pin._a6_q').filter(element => element.innerText.includes('Comment'));
-          const comments = commentElements.map(element => element.innerText.replace('Comment', ''));
-
-          if (!db.documents) db.documents = [];
-          if (db.documents.filter(document => document.source === `instagram.${file}`).length === 0) db.documents = db.documents.concat([{source: `instagram.${file}`, texts: []}]);
-          const set = new Set(db.documents.filter(document => document.source === `instagram.${file}`)[0].texts).union(new Set(comments));
-          db.documents.filter(document => document.source === `instagram.${file}`)[0].texts = Array.from(set);
-        }
         
         // ---------------------------------
         // ------------Misc-----------------
         // ---------------------------------
 
         // update topic model
+        // TODO don't store content in DB
+        // TODO sentiment analysis https://www.npmjs.com/package/sentiment
+
         if (db.postedContent) {
           console.log(`Updating posted topics`);
           const document = db.postedContent.reduce((allText, obj) => allText.concat(obj.texts), []);
@@ -481,6 +495,17 @@ const Home = () => {
             return arr;
           }).flat();
           db.postedTopics = topics;
+        }
+
+        if (db.messagedContent) {
+          console.log(`Updating messaged topics`);
+          const document = db.messagedContent.reduce((allText, obj) => allText.concat(obj.texts), []);
+          const numberOfTopics = 10;
+          const topics = new lda(document, numberOfTopics, 5).map((topic, id) => {
+            const arr = topic.map(({ term }) => ({ topic: term, weight: numberOfTopics - id}));
+            return arr;
+          }).flat();
+          db.messagedTopics = topics;
         }
 
       } catch(e) {

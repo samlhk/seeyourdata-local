@@ -3,7 +3,7 @@ import HeatMap from '@uiw/react-heat-map';
 import Tooltip from '@uiw/react-tooltip';
 
 
-const ActivityHeatMap = ({ db, filterBar = true }) => {
+const InstagramMessageHeatMap = ({ db, filterBar = true }) => {
 
   const [value, setValue] = useState(null);
   const [yearRange, setYearRange] = useState(null);
@@ -17,12 +17,12 @@ const ActivityHeatMap = ({ db, filterBar = true }) => {
     if (db && db.activity) {
       let selected = selectedApp;
       if (!selected) {
-        selected = db.activity.filter(({app}) => !app.includes('instagram: chats with')).sort((item1, item2) => item2.timestamps.length - item1.timestamps.length)[0].app;
+        selected = db.activity.filter(({app}) => app.includes('instagram: chats with') || app === 'instagram: chats and messages').sort((item1, item2) => item2.timestamps.length - item1.timestamps.length)[0].app.replace('instagram: chats with ', '').replace('instagram:', 'all');
         setSelectedApp(selected);
       }
       let earliestYear = 9999;
       let latestYear = 0;
-      const timestamps = db.activity.find(({app}) => app === selected).timestamps;
+      const timestamps = db.activity.find(({app}) => app.replace('instagram: chats with ', '').replace('instagram:', 'all') === selected).timestamps;
       const record = {};
       for (const timestamp of timestamps) {
         const date = new Date(timestamp);
@@ -50,13 +50,13 @@ const ActivityHeatMap = ({ db, filterBar = true }) => {
   return (
     value && yearRange && selectedApp ?
     <div className='heatmap-container'>
-      <h4><strong>{selectedApp}</strong>: usage heat map</h4>
+      <h4><strong>{selectedApp}</strong>: message activity heat map</h4>
 
       {filterBar && <div className='filter-bar'>
-        <div>Select app</div>
+        <div>Select chat</div>
         <select id='app-filter' defaultValue={selectedApp}
           onChange={(e) => {setSelectedApp(e.target.value)}}>
-          { db.activity.filter(({app}) => !app.includes('instagram: chats with')).sort((a, b) => a.app.toLowerCase().localeCompare(b.app.toLowerCase())).map(({app}) => <option value={app}>{app}</option>) }
+          { db.activity.filter(({app}) => app.includes('instagram: chats with') || app === 'instagram: chats and messages').map(activity => ({...activity, app: activity.app.replace('instagram: chats with ', '').replace('instagram:', 'all')})).sort((a, b) => a.app.toLowerCase().localeCompare(b.app.toLowerCase())).map(({app}) => <option value={app}>{app}</option>) }
         </select>
         <div></div>
       </div>}
@@ -90,4 +90,4 @@ const ActivityHeatMap = ({ db, filterBar = true }) => {
   )
 }
 
-export default ActivityHeatMap
+export default InstagramMessageHeatMap
