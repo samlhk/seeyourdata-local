@@ -10,6 +10,7 @@ import Instagram from '../components/instagram/Instagram';
 import Pi from '../components/pi/Pi';
 const { parse } = require('node-html-parser');
 const lda = require('lda');
+const Sentiment = require('sentiment');
 
 const Home = () => {
   const [fileUploadStatus, setFileUploadStatus] = useState("");
@@ -90,7 +91,6 @@ const Home = () => {
       const encodeUnicode = (str) => { return decodeURIComponent(escape(str)); }
       const encodeUnicodes = (lst) => { return lst.map(str => decodeURIComponent(escape(str))); }
 
-      // TODO big refactor
       // Activity
       
       const addActivity = (app, timestamps) => {
@@ -131,52 +131,23 @@ const Home = () => {
         db.messagedContent.find(content => content.source === source).texts = Array.from(set);
       }
 
-      const addAdvertisers = (source, advertisers) => {
+      const addTopics = (type, source, list) => {
         source = encodeUnicode(source);
-        advertisers = encodeUnicodes(advertisers);
-        if (!db.advertisers) db.advertisers = [];
-        if (!db.advertisers.find(advertisers => advertisers.source === source)) db.advertisers = db.advertisers.concat([{source, advertisers: []}]);
-        const set = new Set(db.advertisers.find(advertisers => advertisers.source === source).advertisers).union(new Set(advertisers));
-        db.advertisers.find(advertisers => advertisers.source === source).advertisers = Array.from(set);
-      }
-
-      const addRecommendedTopics = (source, topics) => {
-        source = encodeUnicode(source);
-        topics = encodeUnicodes(topics);
-        if (!db.recommendedTopics) db.recommendedTopics = [];
-        if (!db.recommendedTopics.find(topics => topics.source === source)) db.recommendedTopics = db.recommendedTopics.concat([{source, topics: []}]);
-        const set = new Set(db.recommendedTopics.find(topics => topics.source === source).topics).union(new Set(topics));
-        db.recommendedTopics.find(topics => topics.source === source).topics = Array.from(set);
+        list = encodeUnicodes(list);
+        if (!db[type]) db[type] = [];
+        if (!db[type].find(item => item.soruce === source)) db[type] = db[type] = db[type].concat([{source, list: []}]);
+        const set = new Set(db[type].find(item => item.source === source).list).union(new Set(list));
+        db[type].find(item => item.source === source).list = Array.from(set);
       }
 
       // PI
-      
-      const addPhone = (source, phone) => {
-        if (!db.piPhone) db.piPhone = [];
-        if (!db.piPhone.find(phone => phone.source === source)) db.piPhone = db.piPhone.concat([{source, phone: []}]);
-        const set = new Set(db.piPhone.find(phone => phone.source === source).phone).union(new Set(phone));
-        db.piPhone.find(phone => phone.source === source).phone = Array.from(set);
-      }
 
-      const addLocation = (source, location) => {
-        if (!db.piLocation) db.piLocation = [];
-        if (!db.piLocation.find(location => location.source === source)) db.piLocation = db.piLocation.concat([{source, location: []}]);
-        const set = new Set(db.piLocation.find(location => location.source === source).location).union(new Set(location));
-        db.piLocation.find(location => location.source === source).location = Array.from(set);
-      }
-
-      const addIp = (source, ip) => {
-        if (!db.piIp) db.piIp = [];
-        if (!db.piIp.find(ip => ip.source === source)) db.piIp = db.piIp.concat([{source, ip: []}]);
-        const set = new Set(db.piIp.find(ip => ip.source === source).ip).union(new Set(ip));
-        db.piIp.find(ip => ip.source === source).ip = Array.from(set);
-      }
-
-      const addDevice = (source, device) => {
-        if (!db.piDevice) db.piDevice = [];
-        if (!db.piDevice.find(device => device.source === source)) db.piDevice = db.piDevice.concat([{source, device: []}]);
-        const set = new Set(db.piDevice.find(device => device.source === source).device).union(new Set(device));
-        db.piDevice.find(device => device.source === source).device = Array.from(set);
+      const addPi = (type, source, list) => {
+        const piType = 'pi' + type;
+        if (!db[piType]) db[piType] = [];
+        if (!db[piType].find(item => item.soruce === source)) db[piType] = db[piType] = db[piType].concat([{source, list: []}]);
+        const set = new Set(db[piType].find(item => item.source === source).list).union(new Set(list));
+        db[piType].find(item => item.source === source).list = Array.from(set);
       }
 
       // Instagram
@@ -248,7 +219,7 @@ const Home = () => {
           const data = await instagramAdvertisersFile.async('text');
           const json = JSON.parse(data);
           const advertisers = json.ig_custom_audiences_all_types.map(obj => obj.advertiser_name);
-          addAdvertisers('instagram', advertisers);
+          addTopics('advertisers', 'instagram', advertisers);
         }
 
         let instagramPhoneFile = zip.file('personal_information/information_about_you/possible_phone_numbers.json') ||
@@ -262,7 +233,7 @@ const Home = () => {
             json.inferred_data_inferred_phone_numbers.forEach(obj => {
               if (obj && obj.string_list_data) { obj.string_list_data.forEach(obj => { if (obj && obj.value) {
                 phones.push(obj.value);}})}})}
-          if (phones.length > 0) addPhone('instagram', phones);
+          if (phones.length > 0) addPi('Phone', 'instagram', phones);
         }
 
         let instagramLocationFile = zip.file('personal_information/information_about_you/profile_based_in.json') ||
@@ -273,9 +244,9 @@ const Home = () => {
           const json = JSON.parse(data);
           const locations = [];
           if (json.inferred_data_primary_location) { json.inferred_data_primary_location.forEach((obj) => {
-              if (obj && obj.string_map_data?.['Town/city name']) { 
-                locations.push(obj.string_map_data['Town/city name'].value);}})}
-          if (locations.length > 0) addLocation('instagram', locations);
+              if (obj && obj.string_map_data?.['City Name']) { 
+                locations.push(obj.string_map_data['City Name'].value);}})}
+          if (locations.length > 0) addPi('Location', 'instagram', locations);
         }
 
         let instagramRecommendedTopicsFile = zip.file('preferences/your_topics/recommended_topics.json') ||
@@ -285,7 +256,7 @@ const Home = () => {
           const data = await instagramRecommendedTopicsFile.async('text');
           const json = JSON.parse(data);
           const topics = json.topics_your_topics.map(obj => obj.string_map_data.Name.value);
-          addRecommendedTopics('instagram', topics);
+          addTopics('recommendedTopics', 'instagram', topics);
         }
 
         let instagramOffMetaActivityFile = zip.file('apps_and_websites_off_of_instagram/apps_and_websites/your_activity_off_meta_technologies.json') ||
@@ -316,9 +287,9 @@ const Home = () => {
               source: 'Instagram log in'
             }))
           addLocations(locations);
-          addIp('instagram', ips);
+          addPi('Ip', 'instagram', ips);
           const devices = json.account_history_login_history.map(obj => obj.string_map_data['User Agent'].value);
-          addDevice('instagram', devices);
+          addPi('Device', 'instagram', devices);
         }
 
         let instagramPostCommentsFile = zip.file('your_instagram_activity/comments/post_comments_1.json') ||
@@ -498,8 +469,6 @@ const Home = () => {
         // ---------------------------------
 
         // update topic model
-        // TODO don't store content in DB
-        // TODO sentiment analysis https://www.npmjs.com/package/sentiment
 
         if (db.postedContent) {
           console.log(`Updating posted topics`);
@@ -510,6 +479,14 @@ const Home = () => {
             return arr;
           }).flat();
           db.postedTopics = topics;
+
+          console.log(`Updating posted sentiment`);
+          const sentiment = new Sentiment();
+          const result = db.postedContent.map(({source, texts}) => 
+            ({source, sentiments: texts.map(text => sentiment.analyze(text).comparative)}));
+          db.postedSentiment = result;
+
+          delete db.postedContent;
         }
 
         if (db.messagedContent) {
@@ -521,6 +498,14 @@ const Home = () => {
             return arr;
           }).flat();
           db.messagedTopics = topics;
+
+          console.log(`Updating messaged sentiment`);
+          const sentiment = new Sentiment();
+          const result = db.messagedContent.map(({source, texts}) => 
+            ({source, sentiments: texts.map(text => sentiment.analyze(text).comparative)}));
+          db.messagedSentiment = result;
+
+          delete db.messagedContent;
         }
 
       } catch(e) {

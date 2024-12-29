@@ -3,21 +3,11 @@ import { Chart } from 'chart.js/auto';
 import { Line } from "react-chartjs-2";
 
 
-const ActivityTrend = ({ db, filterBar = true }) => {
+const ActivityTrend = ({ db, colors, filterBar = true }) => {
 
   const [timeRange, setTimeRange] = useState(null);
   const [monthlyActivities, setMonthlyActivities] = useState(null);
   const [filteredApps, setFilteredApps] = useState(new Set());
-
-  const colors = [
-    'rgba(255, 99, 132, 1)',
-    'rgba(75, 192, 192, 1)',
-    'rgba(255, 205, 86, 1)',
-    'rgba(54, 162, 235, 1)',
-    'rgba(153, 102, 255, 1)',
-    'darkgreen',
-    'brown'
-  ]
   
   useEffect(() => {
     render();

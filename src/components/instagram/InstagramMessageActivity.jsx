@@ -3,21 +3,11 @@ import { Chart } from 'chart.js/auto';
 import { Line } from "react-chartjs-2";
 
 
-const InstagramMessageActivity = ({ db, filterBar = true }) => {
+const InstagramMessageActivity = ({ db, colors, filterBar = true }) => {
 
   const [timeRange, setTimeRange] = useState(null);
   const [monthlyActivities, setMonthlyActivities] = useState(null);
   const [filteredActivities, setFilteredActivities] = useState(new Set());
-
-  const colors = [
-    'rgba(0, 128, 0, 1)',
-    'rgba(0, 0, 255, 1)',
-    'rgba(128, 0, 128, 1)',
-    'rgba(255, 165, 0, 1)',
-    'yellow',
-    'rgba(255, 0, 0, 1)',
-    'pink'
-  ]
   
   useEffect(() => {
     render();

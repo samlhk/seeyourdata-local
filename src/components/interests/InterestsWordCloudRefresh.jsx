@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ReactWordCloud from 'react-wordcloud';
 import _ from 'underscore';
 
-const RecommendedTopicsWordCloud = ({ db, filterBar = true }) => {
+const InterestsWordCloudRefresh = ({ db, type, title, filterBar = true }) => {
   
   const [topics, setTopics] = useState();
 
@@ -11,9 +11,9 @@ const RecommendedTopicsWordCloud = ({ db, filterBar = true }) => {
   }, [db])
 
   const render = async () => {
-    if (db && db.recommendedTopics) {
-      setTopics(_.sample(db.recommendedTopics
-        .map(({ topics }) => topics.map(text => ({ text, value: Math.random() * 100 })))
+    if (db && db[type]) {
+      setTopics(_.sample(db[type]
+        .map(({ list }) => list.map(text => ({ text, value: Math.random() * 100 })))
         .reduce((allWords, words) => allWords.concat(words), []), 50));
     } else {
       setTopics(null);
@@ -23,7 +23,7 @@ const RecommendedTopicsWordCloud = ({ db, filterBar = true }) => {
   return (
     topics ?
     <div className='interests-container'>
-      <h4>Topics for content recommendations</h4>
+      <h4>{title}</h4>
 
       {filterBar && <div className='filter-bar'>
         <div></div>
@@ -38,4 +38,4 @@ const RecommendedTopicsWordCloud = ({ db, filterBar = true }) => {
   )
 }
 
-export default RecommendedTopicsWordCloud
+export default InterestsWordCloudRefresh

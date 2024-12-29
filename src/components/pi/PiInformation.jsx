@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 
 const PiInformation = ({ db }) => {
-  
-  const [phones, setPhones] = useState();
-  const [locations, setLocations] = useState();
-  const [ips, setIps] = useState();
-  const [devices, setDevices] = useState();
+
+  const [pis, setPis] = useState();
+
+  const types = ['Phone', 'Location', 'Ip', 'Device'];
+  const displayNames = ['Phone numbers', 'Locations', 'IP addresses', 'Devices'];
 
   useEffect(() => {
     render();
@@ -13,68 +13,31 @@ const PiInformation = ({ db }) => {
 
   const render = async () => {
     if (db) {
-      if (db.piPhone) {
-        setPhones(db.piPhone
-          .map(({ source, phone }) => phone.map(phone => ({ source, phone })))
-          .reduce((allPhones, phones) => allPhones.concat(phones), []));
-      }
-      if (db.piLocation) {
-        setLocations(db.piLocation
-          .map(({ source, location }) => location.map(location => ({ source, location })))
-          .reduce((allLocations, locations) => allLocations.concat(locations), []));
-      }
-      if (db.piIp) {
-        setIps(db.piIp
-          .map(({ source, ip }) => ip.map(ip => ({ source, ip })))
-          .reduce((allIps, ips) => allIps.concat(ips), [])
-          .sort((item1, item2) => item1.ip.localeCompare(item2.ip)));
-      }
-      if (db.piDevice) {
-        setDevices(db.piDevice
-          .map(({ source, device }) => device.map(device => ({ source, device })))
-          .reduce((allDevices, devices) => allDevices.concat(devices), [])
-          .sort((item1, item2) => item1.device.localeCompare(item2.device)));
-      }
+      const newPis = []
+      types.forEach(type => {
+        const piType = 'pi' + type;
+        newPis.push(db[piType] ? 
+          db[piType].map(({ source, list }) => list.map(item => ({ source, item })))
+          .reduce((allItems, item) => allItems.concat(item), [])
+          .sort((item1, item2) => item1.item.localeCompare(item2.item)) : [])
+      });
+      setPis(newPis);
     } else {
-      setPhones(null);
-      setLocations(null);
-      setIps(null);
-      setDevices(null);
+      setPis(null);
     }
   }
 
   return (
-    phones || locations || ips || devices ?
+    pis && pis.find(list => list.length > 0) ?
     <div>
       <h4>Personal Information</h4>
       <table>
         {
-          phones &&
+          pis.map((pi, index) => pi.length > 0 ? 
             <>
-              <tr><th>Phone Number</th><th>Source</th></tr>
-              { phones.map(({ source, phone }) => <tr><td>{phone}</td><td>{source}</td></tr>) }
-            </>
-        }
-        {
-          locations &&
-            <>
-              <tr><th>Location</th><th>Source</th></tr>
-              { locations.map(({ source, location }) => <tr><td>{location}</td><td>{source}</td></tr>) }
-            </>
-        }
-        {
-          ips &&
-            <>
-              <tr><th>IP addresses</th><th>Source</th></tr>
-              { ips.map(({ source, ip }) => <tr><td>{ip}</td><td>{source}</td></tr>) }
-            </>
-        }
-        {
-          devices &&
-            <>
-              <tr><th>Devices</th><th>Source</th></tr>
-              { devices.map(({ source, device }) => <tr><td>{device}</td><td>{source}</td></tr>) }
-            </>
+              <tr><th>{displayNames[index]}</th><th>Source</th></tr>
+              { pi.map(({ source, item }) => <tr><td>{item}</td><td>{source}</td></tr>) }
+            </> : <></>)
         }
       </table>
     </div>: <></>
