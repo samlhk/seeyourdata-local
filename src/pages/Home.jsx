@@ -88,8 +88,10 @@ const Home = () => {
       // ---------------------------------
 
       // counter a double encoding issue with json and unicode, should be applied to all textual output
-      const encodeUnicode = (str) => { return decodeURIComponent(escape(str)); }
-      const encodeUnicodes = (lst) => { return lst.map(str => decodeURIComponent(escape(str))); }
+      const encodeUnicode = (str) => { 
+        try { return decodeURIComponent(escape(str)); } 
+        catch { return str; }}
+      const encodeUnicodes = (lst) => { return lst.map(str => encodeUnicode(str)); }
 
       // Activity
       

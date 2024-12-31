@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const { jsonToMd } = require('./prompt');
 
 let mPrompts, model, retriever;
 const setUpLLM = async () => {
@@ -64,9 +65,11 @@ app.on("ready", async () => {
   })
 
   ipcMain.handle('write-db', async (event, json) => {
-    // TODO process db.json -> db.md here with code regarding db.json's structure
     try {
+      const md = jsonToMd(json);
       fs.writeFileSync(path.join(app.getPath('userData'), 'db.json'), JSON.stringify(json));
+      fs.writeFileSync(path.join(app.getPath('userData'), 'db.md'), md);
+      await setUpLLM();
       return true;
     } catch (err) {
       console.error(err);
@@ -97,11 +100,10 @@ app.on("ready", async () => {
       // const result = await chain.invoke({ input: query });
       // return result;
 
-      const promptText = `You are an AI chatbot that have read through a user's activity data in the context tags below, please answer their question based on their activity data summary in the context tags
+      const promptText = `You are an AI chatbot in an application that discovers for users what online platforms know about them, you have read through a user's data downloads from online platforms in the context tags below, please answer their question based on their data summary in the context tags
         <context>{context}</context>
         question: {input}
       `;
-
       const mRetrieval = await import("langchain/chains/retrieval");
       const mCombineDocuments = await import("langchain/chains/combine_documents");
       const prompt = mPrompts.ChatPromptTemplate.fromTemplate(promptText);
