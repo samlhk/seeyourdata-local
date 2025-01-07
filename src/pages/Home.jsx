@@ -8,16 +8,18 @@ import { Tooltip } from 'react-tooltip'
 import Dialogue from '../components/Dialogue';
 import Instagram from '../components/instagram/Instagram';
 import Pi from '../components/pi/Pi';
+import Card from '../components/Card';
 const { parse } = require('node-html-parser');
 const lda = require('lda');
 const Sentiment = require('sentiment');
 
 const Home = () => {
+  // TODO revamp
   const [fileUploadStatus, setFileUploadStatus] = useState("");
   const [file, setFile] = useState();
   const [downloadFiles, setDownloadFiles] = useState([]);
   const [dbPath, setDBPath] = useState('');
-  const [instructions, setInstructions] = useState('');
+  const [card, setCard] = useState('');
   const [db, setDB] = useState({});
 
   const warningStatusPrefix = 'Warning: ';
@@ -539,35 +541,46 @@ const Home = () => {
           <ol>
             <h5><li>Obtain data downloads from online platforms</li></h5>
             See below for instructions and supported platforms: <br/>
-            <button onClick={() => {setInstructions(instructions === 'google' ? '' : 'google')}} className={instructions === 'google' ? 'highlighted' : ''}>Google</button>&nbsp;
-            <button onClick={() => {setInstructions(instructions === 'facebook' ? '' : 'facebook')}} className={instructions === 'facebook' ? 'highlighted' : ''}>Facebook</button>&nbsp;
-            <button onClick={() => {setInstructions(instructions === 'instagram' ? '' : 'instagram')}} className={instructions === 'instagram' ? 'highlighted' : ''}>Instagram</button>&nbsp;
-            <button onClick={() => {setInstructions(instructions === 'x' ? '' : 'x')}} className={instructions === 'x' ? 'highlighted' : ''}>X (Twitter)</button>&nbsp;
-            <button onClick={() => {setInstructions(instructions === 'linkedin' ? '' : 'linkedin')}} className={instructions === 'linkedin' ? 'highlighted' : ''}>LinkedIn</button>&nbsp;
-            {instructions === 'google' && 
-              <ol>
-                <li>Visit <a href='https://takeout.google.com/' target='_blank'>Google Takeout (https://takeout.google.com/)</a> and log in to your Google account</li>
-                <li>Select data to include and choose file type, frequency and destination (Select File type: .zip; File size: 1GB)</li>
-                <li>Click Create Export</li>
-                <li>Wait for Google to send you your data export (this may take a few days)</li>
-                <li>Your data downloads should be files in the form of <strong>takeout-xxxx-xxx.zip</strong></li>
-              </ol>}
-            {instructions === 'facebook' &&
-              <ol>
-                <li>Follow the instructions on <a href='https://www.facebook.com/help/212802592074644' target='_blank'>https://www.facebook.com/help/212802592074644</a></li>
-                <li>Select How much information do you want? Available Information; Format: JSON</li>
-                <li>Wait for Meta to send you your data export (this may take a few days)</li>
-                <li>Your data downloads should be files in the form of <strong>facebook-xxxx-xxx.zip</strong></li>
-              </ol>}
-            {instructions === 'instagram' &&
-              <ol>
-                <li>Follow the instructions on <a href='https://help.instagram.com/181231772500920' target='_blank'>https://help.instagram.com/181231772500920</a></li>
-                <li>Select How much information do you want? Available Information; Format: JSON</li>
-                <li>Wait for Meta to send you your data export (this may take a few days)</li>
-                <li>Your data downloads should be files in the form of <strong>instagram-xxxx-xxx.zip</strong></li>
-              </ol>}
+            <button onClick={() => {setCard(card === 'google' ? '' : 'google')}} className={card === 'google' ? 'highlighted' : ''}>Google</button>&nbsp;
+            <button onClick={() => {setCard(card === 'instagram' ? '' : 'instagram')}} className={card === 'instagram' ? 'highlighted' : ''}>Instagram</button>&nbsp;
+            <button disabled onClick={() => {setCard(card === 'facebook' ? '' : 'facebook')}} className={card === 'facebook' ? 'highlighted' : ''}>Facebook (coming soon)</button>&nbsp;
+            <button disabled onClick={() => {setCard(card === 'x' ? '' : 'x')}} className={card === 'x' ? 'highlighted' : ''}>X (Twitter) (coming soon)</button>&nbsp;
+            <button disabled onClick={() => {setCard(card === 'linkedin' ? '' : 'linkedin')}} className={card === 'linkedin' ? 'highlighted' : ''}>LinkedIn (coming soon)</button>&nbsp;
+            {
+              card === 'google' &&
+              <Card toggleCard={() => {setCard('')}} title='Download your data from Google' content=
+              {
+                <ol>
+                  <li>Go to <a href='https://takeout.google.com/' target='_blank'>Google Takeout (https://takeout.google.com/)</a> while logged in to your Google account</li>
+
+                  <li>Select data you want to download (select all for a comprehensive review) and click <i>Next Step</i><br/><img src={require('../img/google1.png')} /></li>
+                  <li>Select <i>Transfer to: Send download link via email</i> and <i>Frequency: Export once</i><br/><img src={require('../img/google2.png')} /></li>
+                  <li>Select <i>File type: .zip</i>, <i>File size: 1 GB</i> and click <i>Create export</i><br/><img src={require('../img/google3.png')} /></li>
+                  <li>Your request has been sent and it might take a couple of hours or days<br/><img src={require('../img/google4.png')} /></li>
+                  <li>Download your data when you have received this email from Google, your data downloads should be (multiple) files in the form of <strong>takeout-xxxx-xxx.zip</strong><br/><img src={require('../img/google5.png')} /></li>
+                </ol>
+              }/>
+            }
+            {
+              card === 'instagram' &&
+              <Card toggleCard={() => {setCard('')}} title='Download your data from Instagram' content=
+              {
+                <ol>
+                  <li>Follow the instructions on <a href='https://help.instagram.com/181231772500920' target='_blank'>https://help.instagram.com/181231772500920</a>, these steps are written with reference to it</li>
+                  <li>Go to <a href='https://accountscenter.instagram.com/info_and_permissions/' target='_blank'>https://accountscenter.instagram.com/info_and_permissions/</a> while logged in to your Instagram/Meta account</li>
+                  <li>Click <i>Download your information</i><br/><img src={require('../img/instagram1.png')} /></li>
+                  <li>Click <i>Download or transfer information</i><br/><img src={require('../img/instagram2.png')} /></li>
+                  <li>Select your Instagram account<br/><img src={require('../img/instagram3.png')} /></li>
+                  <li>Click <i>All available information</i><br/><img src={require('../img/instagram4.png')} /></li>
+                  <li>Click <i>Download to device</i><br/><img src={require('../img/instagram5.png')} /></li>
+                  <li>Select <i>Format: JSON</i> and the <i>Date range</i> and <i>Media quality</i> you desire<br/><img src={require('../img/instagram6.png')} /></li>
+                  <li>Your request has been sent and it might take a couple of hours or days<br/><img src={require('../img/instagram7.png')} /></li>
+                  <li>Download your data when you have received this email from Instagram, your data downloads should be files in the form of <strong>instagram-xxxx-xxx.zip</strong><br/><img src={require('../img/instagram8.png')} /></li>
+              </ol>
+              }/>
+            }            
             <h5><li>Upload the data download zip files to the app</li></h5>
-            See Process your data downloads section for instructions
+            Use the <strong>Process your data downloads</strong> section on the right
             <h5><li>The app processes the data downloads locally and presents you with insights derived from it</li></h5>
             All data is processed locally on your machine, that means the app works even without internet
             <h5><li>Explore your data!</li></h5>
@@ -577,7 +590,7 @@ const Home = () => {
 
         <div className='upload-container'>
           <h4>Process your data downloads</h4>
-          <div>Please upload a zip file</div>
+          <div>Please upload a zip file (this might take a while depending on file size and your computer)</div>
           <input type='file' formEncType='multipart/form-data' name='zipfile' onChange={ (e) => {setFile(e.target.files[0]); setFileUploadStatus('')}}></input>
           <div className='mt-2 mb-3'>
             <button onClick={ uploadFile }>Upload file</button>

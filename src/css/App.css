@@ -20,4 +20,30 @@ button.highlighted {
 .warning {
   color: red;
 }
+
+.card-container {
+  position: fixed;
+  z-index: 100;
+  background: lightgray;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  overscroll-behavior: contain;
+  left: 10vw;
+  width: 80vw;
+  top: 10vh;
+  height: 70vh;
+  border-radius: 1rem;
+  border: solid 5px black;
+  padding:0.5rem;
+}
+
+.card-container::-webkit-scrollbar {
+  display: none;
+}
+
+.exit-button {
+  position: sticky;
+  bottom: 0;
+  float: right;
+}
   
