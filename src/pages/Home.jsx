@@ -14,7 +14,6 @@ const lda = require('lda');
 const Sentiment = require('sentiment');
 
 const Home = () => {
-  // TODO revamp
   const [fileUploadStatus, setFileUploadStatus] = useState("");
   const [file, setFile] = useState();
   const [downloadFiles, setDownloadFiles] = useState([]);
@@ -287,7 +286,7 @@ const Home = () => {
           const latlongs = await window.api.ipsToLatlong(ips);
           const locations = latlongs.map((latlong, index) => ({
               latlong,
-              label: ips[index],
+              label: 'IP: ' + ips[index],
               source: 'Instagram log in'
             }))
           addLocations(locations);
@@ -590,12 +589,12 @@ const Home = () => {
 
         <div className='upload-container'>
           <h4>Process your data downloads</h4>
-          <div>Please upload a zip file (this might take a while depending on file size and your computer)</div>
+          <div>Please upload a zip file</div>
           <input type='file' formEncType='multipart/form-data' name='zipfile' onChange={ (e) => {setFile(e.target.files[0]); setFileUploadStatus('')}}></input>
           <div className='mt-2 mb-3'>
             <button onClick={ uploadFile }>Upload file</button>
             {fileUploadStatus && 
-              fileUploadStatus === loadingStatus ? <span className='loading-icon'></span>: 
+              fileUploadStatus === loadingStatus ? <span><span className='loading-icon'></span> Please wait and do not refresh or close the window, this might take a while depending on file size and your computer</span>: 
               fileUploadStatus.includes(warningStatusPrefix) ? 
                 <span className='warning'> {fileUploadStatus.replace(warningStatusPrefix, '')}</span> :
                 <span className='success'> {fileUploadStatus}</span>}

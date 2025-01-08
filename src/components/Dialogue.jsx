@@ -8,11 +8,13 @@ const Dialogue = ({ db, isHome }) => {
   const [humanChats, setHumanChats] = useState([]);
   const [prompt, setPrompt] = useState('');
 
+  const generatingPrompt = 'generating... (this may take a while, please do not click away)';
+
   const askChatbot = async () => {
     if (prompt) {
       setPrompt('');
       setHumanChats([...humanChats, prompt]);
-      setAiChats([...aiChats, 'generating...']);
+      setAiChats([...aiChats, generatingPrompt]);
       const reply = await window.api.ask(prompt);
       setAiChats([...aiChats, DOMPurify.sanitize(marked.parse(reply || 'Unable to generate answer.'))]);
     }
@@ -25,7 +27,7 @@ const Dialogue = ({ db, isHome }) => {
         {
           aiChats.map((chat, index) => 
             <>
-              <div className={(chat === 'generating...' ? 'flashing' : '') + ' ai-chat chat-container'}
+              <div className={(chat === generatingPrompt ? 'flashing' : '') + ' ai-chat chat-container'}
                 dangerouslySetInnerHTML={{__html: chat}}></div>
               {humanChats.length > index &&
                 <div className='human-chat chat-container'>{humanChats[index]}</div>
@@ -35,7 +37,7 @@ const Dialogue = ({ db, isHome }) => {
         }
         <div className='prompt-container'>
           <textarea name="prompt" rows="2" value={ prompt } onChange={(e) => { setPrompt(e.target.value) }}></textarea>
-          <button className='mt-1' onClick={ askChatbot } disabled={ aiChats[aiChats.length - 1] === 'generating...' }>Send</button>
+          <button className='mt-1' onClick={ askChatbot } disabled={ aiChats[aiChats.length - 1] === generatingPrompt }>Send</button>
         </div>
       </div> : <></>
   )

@@ -10,6 +10,7 @@ const setUpLLM = async () => {
   // const loader = new mJson.JSONLoader(path.join(app.getPath('userData'), 'db.json'));
   // const docs = await loader.load();
 
+  // TODO catch prompt too large errors
   mPrompts = await import("@langchain/core/prompts");
   const mText = await import("langchain/document_loaders/fs/text");
   const mTextSplitter = await import("langchain/text_splitter");
