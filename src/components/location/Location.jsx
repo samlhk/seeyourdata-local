@@ -28,7 +28,6 @@ const Location = ( { db, isHome }) => {
         </div> : <></>) :
       <>
         <LocationMap db = { db }/>
-        <div>Location visualisation 2</div>
       </>
   )
 }

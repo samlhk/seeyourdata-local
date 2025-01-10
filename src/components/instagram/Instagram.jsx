@@ -30,7 +30,6 @@ const Instagram = ({ db, isHome }) => {
         <InstagramAccounts db = { db } category='StoryInteractedAccounts' medias={['emoji sliders', 'polls', 'questions', 'quizzes', 'countdowns']} title='Story interaction accounts' colors={ shuffleSeed.shuffle(colorScheme[0], 'e') }/>
         <InstagramMessageActivity db = { db } colors = { shuffleSeed.shuffle(colorScheme[1], 'p') }/>
         <InstagramMessageHeatMap db = { db }/>
-        <div>Instagram visualisation 2</div>
       </>
   )
 }

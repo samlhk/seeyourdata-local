@@ -11,6 +11,7 @@ const setUpLLM = async () => {
   // const docs = await loader.load();
 
   // TODO catch prompt too large errors
+  // TODO google prompts
   mPrompts = await import("@langchain/core/prompts");
   const mText = await import("langchain/document_loaders/fs/text");
   const mTextSplitter = await import("langchain/text_splitter");

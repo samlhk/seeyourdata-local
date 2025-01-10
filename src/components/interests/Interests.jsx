@@ -11,7 +11,7 @@ const Interests = ({ db, isHome }) => {
 
   return (
     isHome ?
-      (db.postedTopics || db.postedSentiment || db.messagedTopics || db.messagedSentiment || db.advertisers || db.recommendedTopics ?
+      (db.postedTopics || db.postedSentiment || db.messagedTopics || db.messagedSentiment || db.advertisers || db.recommendedTopics || db.searchedTopics || db.viewedTopics ?
         <div className='explore-more-container' onClick={ () => navigate('/interests') }>
           <div className='explore-more-bar'>
             <button className='explore-more-indicator'>Explore More <FaLongArrowAltRight/></button>
@@ -25,7 +25,8 @@ const Interests = ({ db, isHome }) => {
         <SentimentDistribution db = { db } type='messagedSentiment' title='Sentiment scores from private messages' />
         <InterestsWordCloudRefresh db = { db } type='advertisers' title='Your advertisers' />
         <InterestsWordCloudRefresh db = { db } type='recommendedTopics' title='Topics for content recommendations' />
-        <div>Interests visualisation 2</div>
+        <InterestsWordCloud db = { db } type='searchedTopics' title='Topics you have searched for' />
+        <InterestsWordCloud db = { db } type='viewedTopics' title='Topics you have viewed' />
       </>
   )
 }

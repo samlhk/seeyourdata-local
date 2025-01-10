@@ -23,7 +23,6 @@ const Activity = ({ db, isHome }) => {
       <>
         <ActivityTrend db = { db } colors = { shuffleSeed.shuffle(colorScheme[0], 'a') }/>
         <ActivityHeatMap db = { db }/>
-        <div>Activity visualisation 2</div>
       </>
   )
 }

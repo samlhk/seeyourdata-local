@@ -25,6 +25,15 @@ export const colorScheme = [
     'rgba(128, 0, 128, 1)',
     'yellow',
     'pink'
+  ],
+  [
+    '#4285F4',
+    '#DB4437',
+    '#F4B400',
+    '#0F9D58',
+    'purple',
+    'brown',
+    'magenta'
   ]
 ]
 
@@ -39,6 +48,7 @@ function App() {
           <Route path='/location' element={ <Page category='location'/> }/>
           <Route path='/pi' element={ <Page category='pi'/> }/>
           <Route path='/instagram' element={ <Page category='instagram'/> }/>
+          <Route path='/google' element={ <Page category='google'/> }/>
       </Routes>
     </Router>
   );

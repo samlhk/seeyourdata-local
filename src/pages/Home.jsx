@@ -9,6 +9,7 @@ import Dialogue from '../components/Dialogue';
 import Instagram from '../components/instagram/Instagram';
 import Pi from '../components/pi/Pi';
 import Card from '../components/Card';
+import Google from '../components/google/Google';
 const { parse } = require('node-html-parser');
 const lda = require('lda');
 const Sentiment = require('sentiment');
@@ -116,22 +117,14 @@ const Home = () => {
 
       // Interests
       
-      const addPostedTexts = (source, texts) => {
+      const addContent = (type, source, list) => {
         source = encodeUnicode(source);
-        texts = encodeUnicodes(texts);
-        if (!db.postedContent) db.postedContent = [];
-        if (!db.postedContent.find(content => content.source === source)) db.postedContent = db.postedContent.concat([{source, texts: []}]);
-        const set = new Set(db.postedContent.find(content => content.source === source).texts).union(new Set(texts));
-        db.postedContent.find(content => content.source === source).texts = Array.from(set);
-      }
-
-      const addMessagedTexts = (source, texts) => {
-        source = encodeUnicode(source);
-        texts = encodeUnicodes(texts);
-        if (!db.messagedContent) db.messagedContent = [];
-        if (!db.messagedContent.find(content => content.source === source)) db.messagedContent = db.messagedContent.concat([{source, texts: []}]);
-        const set = new Set(db.messagedContent.find(content => content.source === source).texts).union(new Set(texts));
-        db.messagedContent.find(content => content.source === source).texts = Array.from(set);
+        list = encodeUnicodes(list);
+        const key = type + 'Content';
+        if (!db[key]) db[key] = [];
+        if (!db[key].find(content => content.source === source)) db[key] = db[key].concat([{source, texts: []}]);
+        const set = new Set(db[key].find(content => content.source === source).texts).union(new Set(list));
+        db[key].find(content => content.source === source).texts = Array.from(set);
       }
 
       const addTopics = (type, source, list) => {
@@ -159,6 +152,18 @@ const Home = () => {
         const instagramCategory = 'instagram' + category;
         if (!db[instagramCategory]) db[instagramCategory] = {};
         db[instagramCategory][media] = list;
+      }
+
+      // Google
+      
+      const addGoogle = (category, list) => {
+        list = encodeUnicodes(list);
+        if (!new Set(list).isSubsetOf(new Set(db[category] || []))) db[category] = (db[category] || []).concat(list);
+      }
+
+      const addSites = (sites) => {
+        sites = encodeUnicodes(sites);
+        if (!new Set(sites).isSubsetOf(new Set(db.sites || []))) db.sites = (db.sites || []).concat(sites);
       }
 
       try {
@@ -304,7 +309,7 @@ const Home = () => {
           const timestamps = json.map(obj => new Date(obj.string_map_data.Time.timestamp * 1000).toString());
           addActivity('instagram: comment on posts', timestamps);
           const comments = json.map(obj => obj.string_map_data?.Comment?.value);
-          addPostedTexts('instagram post comments', comments);
+          addContent('posted', 'instagram post comments', comments);
           const accounts = json.filter(obj => obj.string_map_data['Media Owner']).map(obj => obj.string_map_data['Media Owner'].value);
           addInstagram('CommentedAccounts', 'posts', accounts);
         }
@@ -318,7 +323,7 @@ const Home = () => {
           const timestamps = json.comments_reels_comments.map(obj => new Date(obj.string_map_data.Time.timestamp * 1000).toString());
           addActivity('instagram: comment on reels', timestamps);
           const comments = json.comments_reels_comments.map(obj => obj.string_map_data?.Comment?.value);
-          addPostedTexts('instagram reel comments', comments);
+          addContent('posted', 'instagram reel comments', comments);
           const accounts = json.comments_reels_comments.filter(obj => obj.string_map_data['Media Owner']).map(obj => obj.string_map_data['Media Owner'].value);
           addInstagram('CommentedAccounts', 'reels', accounts);
         }
@@ -377,7 +382,7 @@ const Home = () => {
           allMessageTimestamps = allMessageTimestamps.concat(timestamps);
           addActivity(`instagram: chats with ${chatName}`, timestamps);
           const messages = json.messages.filter(obj => obj.sender_name === you).map(obj => obj.content);
-          addMessagedTexts('instagram messages', messages);
+          addContent('messaged', 'instagram messages', messages);
         }
         if (allMessageTimestamps.length > 0) addActivity('instagram: chats and messages', allMessageTimestamps);
 
@@ -444,19 +449,75 @@ const Home = () => {
         // ---------------------------------
         // ------------Google---------------
         // ---------------------------------
+
+        // Google Utilities
+        
+        const formatTimestamp = (timestamp) => {
+          if (timestamp.includes('BST')) return timestamp.replace('BST', '');
+          return timestamp;
+        }
+
+        const activityApps = ['Ads', 'Chrome', 'Developers', 'Drive', 'Flights', 'Help', 'Hotels', 'Image Search', 'Search', 'Shopping', 'Takeout'];
+        for await (const app of activityApps) {
+          let file = zip.file(`Takeout/My Activity/${app}/My Activity.html`) || 
+            zip.file(innerZipFolder + `Takeout/My Activity/${app}/My Activity.html`);
+          if (file) {
+            console.log(`Processing google ${app}`);
+            const data = await file.async('text');
+            const root = parse(data);
+            const divElements = root.getElementsByTagName('div');
+            const timestamps = [];
+            const searches = [];
+            const views = [];
+            const sites = [];
+            for (const element of divElements) {
+              const description = element.innerText.split('\n');
+              if (element.innerText.match(/^Searched\sfor\s/)) searches.push(description[0].slice(13));
+              else if (element.innerText.match(/^Viewed\simage\sfrom\s/)) views.push(description[0].slice(18));
+              else if (element.innerText.match(/^Viewed\s/)) views.push(description[0].slice(7));
+              else if (element.innerText.match(/^Visited\s/)) sites.push(description[0].slice(8));
+              else if (element.innerText.match(/^(Initiated|Used)\s/)) {}
+              else continue;
+              timestamps.push(new Date(formatTimestamp(description[description.length - 1])));
+            }
+            if (timestamps.length > 0) addActivity(`google: Google ${app}`, timestamps);
+            if (searches.length > 0) addContent('searched', `Google ${app}`, searches);
+            if (views.length > 0) addContent('viewed', `Google ${app}`, views);
+            if (sites.length > 0) addGoogle('sites', sites);
+          }
+        }
+
+        let googlePlayStoreFile = zip.file('Takeout/My Activity/Google Play Store/My Activity.html') || 
+          zip.file(innerZipFolder + 'Takeout/My Activity/Google Play Store/My Activity.html');
+        if (googlePlayStoreFile) {
+          console.log('Processing google play store');
+          const data = await googlePlayStoreFile.async('text');
+          const root = parse(data);
+          const divElements = root.getElementsByTagName('div');
+          divElements.forEach(element => {
+            if (element.innerText.match(/^Used\s/)) {
+              const description = element.innerText.split('\n');
+              const app = description[0].slice(5);
+              const timestamp = new Date(formatTimestamp(description[description.length - 1]));
+              addActivity(app, [timestamp]);
+            }
+          })
+        }
         
         let googleMapsFile = zip.file('Takeout/My Activity/Maps/My Activity.html') || 
           zip.file(innerZipFolder + 'Takeout/My Activity/Maps/My Activity.html');
         if (googleMapsFile) {
-          // TODO add access timestamps to activity and google
           console.log('Processing google maps');
           const data = await googleMapsFile.async('text');
           const root = parse(data);
           const linkElements = root.getElementsByTagName('a');
+          const timestamps = [];
           const locations = [];
           linkElements.forEach(element => {
             const latlong = element.getAttribute('href').match(/@-?\d+.\d+,-?\d+.\d+/);
             if (latlong) {
+              const description = element.parentNode.innerText.split('\n');
+              timestamps.push(new Date(formatTimestamp(description[description.length - 1])))
               locations.push({
                 latlong: latlong[0].replace('@', ''),
                 label: element.innerText,
@@ -464,51 +525,61 @@ const Home = () => {
               })
             }
           })
+          addActivity('google: Google Maps', timestamps);
           addLocations(locations);
         }
+        
+        let googleYoutubeFile = zip.file(`Takeout/My Activity/YouTube/My Activity.html`) || 
+            zip.file(innerZipFolder + `Takeout/My Activity/YouTube/My Activity.html`);
+          if (googleYoutubeFile) {
+            console.log(`Processing Youtube`);
+            const data = await googleYoutubeFile.async('text');
+            const root = parse(data);
+            const divElements = root.getElementsByTagName('div');
+            const timestamps = [];
+            const searches = [];
+            const watched = [];
+            const watchedChannels = [];
+            for (const element of divElements) {
+              const description = element.innerText.split('\n');
+              if (element.innerText.match(/^Searched\sfor\s/)) searches.push(description[0].slice(13));
+              else if (element.innerText.match(/^Watched\s/)) {
+                watched.push(description[0].slice(8));
+                if (description.length > 1) watchedChannels.push(description[1]);
+              }
+              else continue;
+              timestamps.push(new Date(formatTimestamp(description[description.length - 1])));
+            }
+            if (timestamps.length > 0) addActivity('google: YouTube', timestamps);
+            if (searches.length > 0) addContent('searched', 'YouTube', searches);
+            if (watched.length > 0) addContent('youtubeWatched', 'YouTube', watched);
+            if (watchedChannels.length > 0) addGoogle('youtubeWatchedChannels', watchedChannels);
+          }
         
         // ---------------------------------
         // ------------Misc-----------------
         // ---------------------------------
 
-        // update topic model
+        // update topic model and sentiments
 
-        if (db.postedContent) {
-          console.log(`Updating posted topics`);
-          const document = db.postedContent.reduce((allText, obj) => allText.concat(obj.texts), []);
-          const numberOfTopics = 20;
-          const topics = new lda(document, numberOfTopics, 5).map((topic, id) => {
-            const arr = topic.map(({ term }) => ({ topic: term, weight: numberOfTopics - id}));
-            return arr;
-          }).flat();
-          db.postedTopics = topics;
-
-          console.log(`Updating posted sentiment`);
-          const sentiment = new Sentiment();
-          const result = db.postedContent.map(({source, texts}) => 
-            ({source, sentiments: texts.map(text => sentiment.analyze(text).comparative)}));
-          db.postedSentiment = result;
-
-          delete db.postedContent;
-        }
-
-        if (db.messagedContent) {
-          console.log(`Updating messaged topics`);
-          const document = db.messagedContent.reduce((allText, obj) => allText.concat(obj.texts), []);
-          const numberOfTopics = 20;
-          const topics = new lda(document, numberOfTopics, 5).map((topic, id) => {
-            const arr = topic.map(({ term }) => ({ topic: term, weight: numberOfTopics - id}));
-            return arr;
-          }).flat();
-          db.messagedTopics = topics;
-
-          console.log(`Updating messaged sentiment`);
-          const sentiment = new Sentiment();
-          const result = db.messagedContent.map(({source, texts}) => 
-            ({source, sentiments: texts.map(text => sentiment.analyze(text).comparative)}));
-          db.messagedSentiment = result;
-
-          delete db.messagedContent;
+        const types = ['posted', 'messaged', 'searched', 'viewed', 'youtubeWatched'];
+        for (const type of types) {
+          if (db[type + 'Content']) {
+            console.log(`Updating ${type} topics`);
+            const document = db[type + 'Content'].reduce((allText, obj) => allText.concat(obj.texts), []);
+            const numberOfTopics = 20;
+            const topics = new lda(document, numberOfTopics, 5).map((topic, id) => {
+              const arr = topic.map(({ term }) => ({ topic: term, weight: numberOfTopics - id}));
+              return arr;
+            }).flat();
+            db[type + 'Topics'] = topics;
+  
+            console.log(`Updating ${type} sentiment`);
+            const sentiment = new Sentiment();
+            const result = db[type + 'Content'].map(({source, texts}) => 
+              ({source, sentiments: texts.map(text => sentiment.analyze(text).comparative)}));
+            db[type + 'Sentiment'] = result;
+          }
         }
 
       } catch(e) {
@@ -552,11 +623,12 @@ const Home = () => {
                 <ol>
                   <li>Go to <a href='https://takeout.google.com/' target='_blank'>Google Takeout (https://takeout.google.com/)</a> while logged in to your Google account</li>
 
-                  <li>Select data you want to download (select all for a comprehensive review) and click <i>Next Step</i><br/><img src={require('../img/google1.png')} /></li>
-                  <li>Select <i>Transfer to: Send download link via email</i> and <i>Frequency: Export once</i><br/><img src={require('../img/google2.png')} /></li>
-                  <li>Select <i>File type: .zip</i>, <i>File size: 1 GB</i> and click <i>Create export</i><br/><img src={require('../img/google3.png')} /></li>
-                  <li>Your request has been sent and it might take a couple of hours or days<br/><img src={require('../img/google4.png')} /></li>
-                  <li>Download your data when you have received this email from Google, your data downloads should be (multiple) files in the form of <strong>takeout-xxxx-xxx.zip</strong><br/><img src={require('../img/google5.png')} /></li>
+                  <li>Select data you want to download (select all for a comprehensive review), then deselect <i>Drive</i> to reduce download size<br/><img src={require('../img/google1.png')} /></li>
+                  <li>Click <i>Next Step</i><br/><img src={require('../img/google2.png')} /></li>
+                  <li>Select <i>Transfer to: Send download link via email</i> and <i>Frequency: Export once</i><br/><img src={require('../img/google3.png')} /></li>
+                  <li>Select <i>File type: .zip</i>, <i>File size: 1 GB</i> and click <i>Create export</i><br/><img src={require('../img/google4.png')} /></li>
+                  <li>Your request has been sent and it might take a couple of hours or days<br/><img src={require('../img/google5.png')} /></li>
+                  <li>Download your data when you have received this email from Google, your data downloads should be (multiple) files in the form of <strong>takeout-xxxx-xxx.zip</strong><br/><img src={require('../img/google6.png')} /></li>
                 </ol>
               }/>
             }
@@ -619,7 +691,7 @@ const Home = () => {
         <Interests db={ db } isHome={ true }/>
         <Pi db={ db } isHome={ true }/>
         <Instagram db={ db } isHome={ true }/>
-        <div>Google</div>
+        <Google db={ db } isHome={ true }/>
       </div>
     </div>
   )

@@ -5,6 +5,7 @@ import Interests from '../components/interests/Interests';
 import { useNavigate } from 'react-router-dom';
 import Instagram from '../components/instagram/Instagram';
 import Pi from '../components/pi/Pi';
+import Google from '../components/google/Google';
 
 const Page = ({ category }) => {
 
@@ -28,6 +29,7 @@ const Page = ({ category }) => {
       {category ==='interests' && <h1>Interests</h1> }
       {category ==='pi' && <h1>Personal Information</h1> }
       {category ==='instagram' && <h1>Instagram</h1> }
+      {category ==='google' && <h1>Google</h1> }
       <nav>
         <button onClick={() => navigate('/')}>Home</button>
       </nav>
@@ -37,6 +39,7 @@ const Page = ({ category }) => {
         {category === 'interests' && <Interests db={ db }/> }
         {category === 'pi' && <Pi db={ db }/> }
         {category === 'instagram' && <Instagram db={ db }/> }
+        {category === 'google' && <Google db={ db }/> }
       </div>
     </div>
   )

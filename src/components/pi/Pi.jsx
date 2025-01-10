@@ -18,7 +18,6 @@ const Pi = ({ db, isHome }) => {
         </div> : <></>) :
       <>
         <PiInformation db = { db }/>
-        <div>Pi visualisation 2</div>
       </>
   )
 }
