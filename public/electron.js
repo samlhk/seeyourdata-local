@@ -5,13 +5,6 @@ const { jsonToMd } = require('./prompt');
 
 let mPrompts, model, retriever;
 const setUpLLM = async () => {
-  // TODO improve RAG
-  // const mJson = await import("langchain/document_loaders/fs/json");
-  // const loader = new mJson.JSONLoader(path.join(app.getPath('userData'), 'db.json'));
-  // const docs = await loader.load();
-
-  // TODO catch prompt too large errors
-  // TODO google prompts
   mPrompts = await import("@langchain/core/prompts");
   const mText = await import("langchain/document_loaders/fs/text");
   const mTextSplitter = await import("langchain/text_splitter");
@@ -23,14 +16,15 @@ const setUpLLM = async () => {
   const docs = await loader.load();
   const splitter = new mTextSplitter.MarkdownTextSplitter({
     chunkSize: 500,
-    chunkOverlap: 0
+    chunkOverlap: 50
   });
   const splitDocs = await splitter.splitDocuments(docs);
 
-  const vectorStore = await mMemory.MemoryVectorStore.fromDocuments(
-    splitDocs,
-    new mHfTransformers.HuggingFaceTransformersEmbeddings()
-  )
+  const embeddings = new mHfTransformers.HuggingFaceTransformersEmbeddings();
+  const vectorStore = await mMemory.MemoryVectorStore.fromDocuments([], embeddings);
+  for (const doc of splitDocs) {
+    await vectorStore.addDocuments([doc]);
+  }
   retriever = vectorStore.asRetriever();
 
   const modelPath = path.join(__dirname, "models", "llama-3.2-1b-instruct-q8_0.gguf")
@@ -97,11 +91,6 @@ app.on("ready", async () => {
 
   ipcMain.handle('ask', async (event, query) => {
     try {
-      // const prompt = mPrompts.ChatPromptTemplate.fromTemplate(`You are an AI chatbot, please give an answer to the following question even if you are unsure: {input}`);
-      // const chain = prompt.pipe(model);
-      // const result = await chain.invoke({ input: query });
-      // return result;
-
       const promptText = `You are an AI chatbot in an application that discovers for users what online platforms know about them, you have read through a user's data downloads from online platforms in the context tags below, please answer their question based on their data summary in the context tags
         <context>{context}</context>
         question: {input}

@@ -161,11 +161,6 @@ const Home = () => {
         if (!new Set(list).isSubsetOf(new Set(db[category] || []))) db[category] = (db[category] || []).concat(list);
       }
 
-      const addSites = (sites) => {
-        sites = encodeUnicodes(sites);
-        if (!new Set(sites).isSubsetOf(new Set(db.sites || []))) db.sites = (db.sites || []).concat(sites);
-      }
-
       try {
 
         // ---------------------------------

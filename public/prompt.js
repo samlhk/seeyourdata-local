@@ -4,13 +4,13 @@ const jsonToMd = (json) => {
   if (json.activity) {
     json.activity.forEach(({app, timestamps}) => {
       let summary = '';
-      const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
       summary = summary + `user accessed the service: ${app}: ${timestamps.length} times`;
+      // const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
       // months.forEach((month, index) => {
       //   const count = timestamps.filter(timestamp => (new Date(timestamp)).getMonth() == index).length;
       //   summary = summary + `,${count} times in ${month}`;
       // })
+      // const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
       // days.forEach((day, index) => {
       //   const count = timestamps.filter(timestamp => (new Date(timestamp)).getDay() == index).length;
       //   summary = summary + `,${count} times on ${day}`;
@@ -55,6 +55,14 @@ const jsonToMd = (json) => {
     json.recommendedTopics.forEach(({source, list}) => {
       md.push(`the user has the following recommendedTopics on ${source}: ${list}`);
     })
+  }
+
+  if (json.searchedTopics) { 
+    md.push(`the user has searched for the following topics: ${json.searchedTopics.map(({topic}) => topic)}`);
+  }
+
+  if (json.viewedTopics) { 
+    md.push(`the user has viewed content related the following topics: ${json.viewedTopics.map(({topic}) => topic)}`);
   }
 
   if (json.piPhone) {
@@ -114,6 +122,18 @@ const jsonToMd = (json) => {
   //   accounts = accounts.concat(json.instagramStoryInteractedAccounts.countdowns || []);
   //   md.push(`the user has interacted with stories from the following accounts on instagram: ${[...new Set(accounts)]}`);
   // }
+
+  // if (json.sites) {
+  //   md.push(`the user has visited these websites: ${[...new Set(json.sites)]}`);
+  // }
+
+  // if (json.youtubeWatchedChannels) {
+  //   md.push(`the user has watched these channels on YouTube: ${[...new Set(json.youtubeWatchedChannels)]}`);
+  // }
+
+  if (json.youtubeWatchedTopics) { 
+    md.push(`the user has watched video content related the following topics on YouTube: ${json.youtubeWatchedTopics.map(({topic}) => topic)}`);
+  }
 
   return md.join('\n');
 }
