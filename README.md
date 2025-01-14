@@ -1,70 +1,40 @@
-# Getting Started with Create React App
+# See Your Data
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is a desktop app that helps you download your data from online platforms, then explore it with visualisations and an LLM chatbot that runs locally on your machine.
 
-## Available Scripts
+# Getting Started
 
-In the project directory, you can run:
+There are 2 ways to run the app
 
-### `npm start`
+## 1. Install the packaged app
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### Linux (x64)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+1. Download the packaged app at [https://drive.google.com/file/d/1EdGwVEsceknq2VtmFaM2D1ITNhvsgzaL/view?usp=sharing](https://drive.google.com/file/d/1EdGwVEsceknq2VtmFaM2D1ITNhvsgzaL/view?usp=sharing)
+2. Extract the folder `seeyourdata-local-linux-x64`
+3. Execute the file `seeyourdata-local` to launch the app, you can click on the file or run `./seeyourdata-local` in the command line
 
-### `npm test`
+### Windows (x64)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1. Download the packaged app at [https://drive.google.com/file/d/1fzMgGKIJs2rSgMXi7-WZ-S9FUaC53bg_/view?usp=sharing](https://drive.google.com/file/d/1fzMgGKIJs2rSgMXi7-WZ-S9FUaC53bg_/view?usp=sharing)
+2. Extract the folder `seeyourdata-local-win32-x64`
+3. (this step is to prevent a Windows error from preventing an unrecognised app from starting, if step 4 works, you may skip this step) Right click on `seeyourdata-local.exe`, select 'Properties', check 'Unblock' next to the security field 
+4. Click on the executable `seeyourdata-local.exe` to launch the app
 
-### `npm run build`
+## 2. Run the node app directly
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Developer mode (recommended)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1. Download the LLM model and IP database at [https://drive.google.com/drive/folders/1P3Utffjin1a68gczwEG_yqMi_Why84bp?usp=sharing](https://drive.google.com/drive/folders/1P3Utffjin1a68gczwEG_yqMi_Why84bp?usp=sharing)
+2. Copy `models` folder into the `public` folder
+3. Run `npm install --legacy-peer-deps`
+4. Run `npm start` in one terminal, then run `npm run electron` in another terminal
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Package mode
 
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+1. Download the LLM model and IP database at x
+2. Copy `models` folder into the `public` folder
+3. Run `npm install --legacy-peer-deps`
+4. Run `npm run build`
+5. Run `electron-packager . --platform=linux --arch=x64 --overwrite` with your desired platform to produce a packaged app
+5. Follow the steps of running a packaged app above
