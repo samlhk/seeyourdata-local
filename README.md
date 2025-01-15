@@ -16,7 +16,7 @@ There are 2 ways to run the app
 
 ### Windows (x64)
 
-1. Download the packaged app at [https://drive.google.com/file/d/1OVsmSE36eeEtJQBWdPYQ-q2bySM4r78v/view?usp=sharing](https://drive.google.com/file/d/1OVsmSE36eeEtJQBWdPYQ-q2bySM4r78v/view?usp=sharing)
+1. Download the packaged app at [https://drive.google.com/file/d/1gaG8OVRIph8TgdONRD0hgN-iVPybHW2w/view?usp=sharing](https://drive.google.com/file/d/1gaG8OVRIph8TgdONRD0hgN-iVPybHW2w/view?usp=sharing)
 2. Extract the folder `seeyourdata-local-win32-x64`
 3. (this step is to prevent a Windows error from preventing an unrecognised app from starting, if step 4 works, you may skip this step) Right click on `seeyourdata-local.exe`, select 'Properties', check 'Unblock' next to the security field 
 4. Execute the file `seeyourdata-local.exe` to launch the app, you can click on the file or run `start seeyourdata-local.exe` in the command line
