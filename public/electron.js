@@ -12,7 +12,9 @@ const setUpLLM = async () => {
   const mHfTransformers = await import("@langchain/community/embeddings/hf_transformers");
   const mLlamaCpp = await import("@langchain/community/llms/llama_cpp");
 
-  const loader = new mText.TextLoader(path.join(app.getPath('userData'), 'db.md'));
+  const markdownFilePath = path.join(app.getPath('userData'), 'db.md');
+  if (!fs.existsSync(markdownFilePath)) fs.writeFileSync(markdownFilePath, '');
+  const loader = new mText.TextLoader(markdownFilePath);
   const docs = await loader.load();
   const splitter = new mTextSplitter.MarkdownTextSplitter({
     chunkSize: 500,
