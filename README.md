@@ -39,6 +39,6 @@ There are 2 ways to run the app
 4. Run `npm run build`
 6. (Windows only) Change the package command in `package.json` to `electron-packager . --platform=win32 --arch=x64 --overwrite` and run `npm run package`
 7. (Linux only) Run `npm run package`
-8. Go into the generated folder and find `resources/app/build/index.html`, change `"/static/js/main.<hash>.js"` and `"/static/css/main.<hash>.css"` to `"./static/js/main.<hash>.js"` and `"./static/css/main.<hash>.css"` (use relative paths)
+8. Go into the generated folder and find `resources/app/build/index.html`, change `"/static/js/main.<hash>.js"` and `"/static/css/main.<hash>.css"` to `"./static/js/main.<hash>.js"` and `"./static/css/main.<hash>.css"` (ignore if already have relative paths)
 9. Follow the steps of running a packaged app above
 
