@@ -26,7 +26,6 @@ const Google = ({ db, isHome }) => {
         <GoogleRanking db = { db } category='sites' title='Most visited sites'/>
         <GoogleRanking db = { db } category='youtubeWatchedChannels' title='YouTube most watched channels'/>
         <InterestsWordCloud db = { db } type='youtubeWatchedTopics' title='Topics you have watched on YouTube' />
-        <div>Google Visualisation 2</div>
       </>
   )
 }

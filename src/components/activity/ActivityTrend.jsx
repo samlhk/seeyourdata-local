@@ -19,7 +19,7 @@ const ActivityTrend = ({ db, colors, filterBar = true }) => {
       let earliest = new Date();
       db.activity.sort((item1, item2) => item2.timestamps.length - item1.timestamps.length);
       let activities = db.activity;
-      activities = activities.filter(({app}) => !app.includes('instagram: chats with'));
+      activities = activities.filter(({app}) => !app.includes('instagram: ') && !app.includes('google: '));
       if (filteredApps.size > 0) activities = activities.filter(({app}) => filteredApps.has(app));
       activities = activities.slice(0, top);
       activities = activities.map(({app, timestamps}) => {
@@ -72,7 +72,7 @@ const ActivityTrend = ({ db, colors, filterBar = true }) => {
         <select id='app-filter' defaultValue='all' disabled={filteredApps.size === 7}
           onChange={(e) => {setFilteredApps(filteredApps.union(new Set([e.target.value])))}}>
           <option disabled={true} defaultValue={true} value='all'>All apps</option>
-          { db.activity.filter(({app}) => !app.includes('instagram: chats with')).sort((a, b) => a.app.toLowerCase().localeCompare(b.app.toLowerCase())).map(({app}) => <option value={app}>{app}</option>) }
+          { db.activity.filter(({app}) => !app.includes('instagram: ') && !app.includes('google: ')).sort((a, b) => a.app.toLowerCase().localeCompare(b.app.toLowerCase())).map(({app}) => <option value={app}>{app}</option>) }
         </select>
         <button disabled={filteredApps.size === 0} onClick={() => {
           setFilteredApps(new Set());

@@ -14,23 +14,36 @@ L.Marker.prototype.options.icon = DefaultIcon;
 const LocationMap = ( { db, filterBar = true }) => {
   
   const [locations, setLocations] = useState();
+  const [sources, setSources] = useState();
   const [filteredSources, setFilteredSources] = useState(new Set());
-
 
   useEffect(() => {
     render();
   }, [db, filteredSources])
 
+  const LeafIcon = L.Icon.extend({
+    options: {}
+  });
+  const icons = [
+    new LeafIcon({ iconUrl: require('../../img/marker-icon-blue.png')}),
+    new LeafIcon({ iconUrl: require('../../img/marker-icon-green.png')}),
+    new LeafIcon({ iconUrl: require('../../img/marker-icon-red.png')}),
+    new LeafIcon({ iconUrl: require('../../img/marker-icon-yellow.png')})
+  ];
+
   const render = async () => {
     if (db && db.location) {
       setLocations(db.location.filter(({source}) => filteredSources.size === 0 || filteredSources.has(source)));
+      let mapSources = [];
+      db.location.forEach(({source}) => {if (!mapSources.includes(source)) mapSources.push(source)});
+      setSources(mapSources);
     } else {
       setLocations(null);
     }
   }
 
   return (
-    locations ?
+    locations && sources ?
     <div>
       <h4>Locations{filteredSources.size > 0 && ` (from: ${[...filteredSources].join(', ')})`}</h4>
 
@@ -54,11 +67,10 @@ const LocationMap = ( { db, filterBar = true }) => {
         />
         {
           locations.map(location => 
-          <Marker position={location.latlong.split(',')}>
+          <Marker position={location.latlong.split(',')} icon={icons[sources.indexOf(location.source)]}>
             <Popup>{location.label}<br />{`source: ${location.source}`}</Popup>
           </Marker>)
         }
-        
       </Map>
     </div>:<></>
   )

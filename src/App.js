@@ -26,6 +26,7 @@ export const colorScheme = [
     'yellow',
     'pink'
   ],
+  // Google
   [
     '#4285F4',
     '#DB4437',
@@ -34,6 +35,17 @@ export const colorScheme = [
     'purple',
     'brown',
     'magenta'
+  ],
+  // Hours
+  [
+    'rgb(255, 0, 0, 0.8)',
+    'rgb(255, 191, 0, 0.8)',
+    'rgb(128, 255, 0, 0.8)',
+    'rgb(0, 255, 64, 0.8)', 
+    'rgb(0, 255, 255, 0.8)',
+    'rgb(0, 64, 255, 0.8)',
+    'rgb(128, 0, 255, 0.8)',
+    'rgb(255, 0, 64, 0.8)'
   ]
 ]
 

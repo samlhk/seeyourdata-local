@@ -74,6 +74,15 @@ app.on("ready", async () => {
     }
   })
 
+  ipcMain.handle('write-db-no-llm', async (event, json) => {
+    try {
+      fs.writeFileSync(path.join(app.getPath('userData'), 'db.json'), JSON.stringify(json));
+      return true;
+    } catch (err) {
+      console.error(err);
+    }
+  })
+
   ipcMain.handle('get-db-path', async (event, arg) => {
     return path.join(app.getPath('userData'), 'db.json');
   })

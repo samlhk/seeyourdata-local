@@ -7,6 +7,7 @@ import InstagramMessageActivity from './InstagramMessageActivity';
 import InstagramMessageHeatMap from './InstagramMessageHeatMap';
 import { colorScheme } from '../../App';
 import shuffleSeed from 'shuffle-seed';
+import InstagramMessageTimes from './InstagramMessageTimes';
 
 
 const Instagram = ({ db, isHome }) => {
@@ -30,6 +31,7 @@ const Instagram = ({ db, isHome }) => {
         <InstagramAccounts db = { db } category='StoryInteractedAccounts' medias={['emoji sliders', 'polls', 'questions', 'quizzes', 'countdowns']} title='Story interaction accounts' colors={ shuffleSeed.shuffle(colorScheme[0], 'e') }/>
         <InstagramMessageActivity db = { db } colors = { shuffleSeed.shuffle(colorScheme[1], 'p') }/>
         <InstagramMessageHeatMap db = { db }/>
+        <InstagramMessageTimes db = { db }/>
       </>
   )
 }

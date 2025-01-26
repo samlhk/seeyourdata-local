@@ -540,7 +540,7 @@ const Home = () => {
               if (element.innerText.match(/^Searched\sfor\s/)) searches.push(description[0].slice(13));
               else if (element.innerText.match(/^Watched\s/)) {
                 watched.push(description[0].slice(8));
-                if (description.length > 1) watchedChannels.push(description[1]);
+                if (description.length > 1 && !description[1].includes('Watched at') && isNaN(new Date(description[1]))) watchedChannels.push(description[1]);
               }
               else continue;
               timestamps.push(new Date(formatTimestamp(description[description.length - 1])));
