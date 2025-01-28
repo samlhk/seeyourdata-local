@@ -41,9 +41,24 @@ button.highlighted {
   display: none;
 }
 
+.card-container h5 {
+  margin-top: 2rem;
+}
+
 .exit-button {
   position: sticky;
   bottom: 0;
   float: right;
+}
+
+.info-button {
+  display: flex;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.1rem 1rem;
+}
+
+.info-button h4 {
+  margin: 0;
 }
   

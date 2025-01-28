@@ -10,6 +10,7 @@ import Instagram from '../components/instagram/Instagram';
 import Pi from '../components/pi/Pi';
 import Card from '../components/Card';
 import Google from '../components/google/Google';
+import InfoCard from '../components/InfoCard';
 const { parse } = require('node-html-parser');
 const lda = require('lda');
 const Sentiment = require('sentiment');
@@ -602,7 +603,16 @@ const Home = () => {
       <div className='home-container'>
 
         <div>
-          <h4>How it Works</h4>
+          <InfoCard 
+            title='How it Works'
+            content={
+              <>
+                <h5>Local App</h5>
+                <h5>Data Accuracy</h5>
+                <h5>Bugs and Issues</h5>
+              </>
+            }
+          />
           <ol>
             <h5><li>Obtain data downloads from online platforms</li></h5>
             See below for instructions and supported platforms: <br/>
@@ -668,7 +678,7 @@ const Home = () => {
           </div>
           <div>
             <strong>Your data downloads</strong>
-            <a data-tooltip-id="downloads-info-tooltip" data-tooltip-content={`Useful info from your data downloads is parsed and stored in ${dbPath},db.md and nowhere else`}>
+            <a data-tooltip-id="downloads-info-tooltip" data-tooltip-content={`Useful info from your data downloads is parsed and stored in ${dbPath},db.md,chat.json and nowhere else`}>
               &nbsp;<sup><FaInfoCircle/></sup></a>
             <Tooltip id="downloads-info-tooltip" clickable />
             {downloadFiles.length > 0 ? <div>

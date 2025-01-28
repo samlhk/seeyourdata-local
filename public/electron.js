@@ -74,9 +74,19 @@ app.on("ready", async () => {
     }
   })
 
-  ipcMain.handle('write-db-no-llm', async (event, json) => {
+  ipcMain.handle('read-chats', async (event, arg) => {
     try {
-      fs.writeFileSync(path.join(app.getPath('userData'), 'db.json'), JSON.stringify(json));
+      const data = fs.readFileSync(path.join(app.getPath('userData'), 'chats.json'), 'utf8');
+      return data ? JSON.parse(data) : {chats: []};
+    } catch (err) {
+      console.error(err);
+      return {chats: []}
+    }
+  })
+
+  ipcMain.handle('write-chats', async (event, json) => {
+    try {
+      fs.writeFileSync(path.join(app.getPath('userData'), 'chats.json'), JSON.stringify(json));
       return true;
     } catch (err) {
       console.error(err);

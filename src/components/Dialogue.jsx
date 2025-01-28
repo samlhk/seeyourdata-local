@@ -27,27 +27,27 @@ const Dialogue = ({ db, isHome }) => {
       setAiChats([...aiChats, answer]);
 
       const chatRecord = [[...aiChats, answer], [...humanChats, prompt]];
-      const db = await window.api.readDB();
-      if (chatId === null) db.chats = (db.chats || []).concat([chatRecord]);
-      else db.chats[chatId] = chatRecord;
-      await window.api.writeDBNoLLM(db);
-      setAllChats(db.chats);
-      if (chatId === null) setChatId(db.chats.length - 1);
+      const chatHistory = await window.api.readChats();
+      if (chatId === null) chatHistory.chats = (chatHistory.chats || []).concat([chatRecord]);
+      else chatHistory.chats[chatId] = chatRecord;
+      await window.api.writeChats(chatHistory);
+      setAllChats(chatHistory.chats);
+      if (chatId === null) setChatId(chatHistory.chats.length - 1);
     }
   }
 
   const initialUpdateChats = async () => {
-    const db = await window.api.readDB();
-    setAllChats(db.chats || []);
+    const chatHistory = await window.api.readChats();
+    setAllChats(chatHistory.chats || []);
   }
 
   const deleteChat = async () => {
     setAiChats([defaultAiPrompt]);
     setHumanChats([]);
-    const db = await window.api.readDB();
-    db.chats.splice(chatId, 1);
-    await window.api.writeDBNoLLM(db);
-    setAllChats(db.chats);
+    const chatHistory = await window.api.readChats();
+    chatHistory.chats.splice(chatId, 1);
+    await window.api.writeChats(chatHistory);
+    setAllChats(chatHistory.chats);
     setChatId(null);
   }
 

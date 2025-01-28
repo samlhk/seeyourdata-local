@@ -5,16 +5,16 @@ const jsonToMd = (json) => {
     json.activity.forEach(({app, timestamps}) => {
       let summary = '';
       summary = summary + `user accessed the service: ${app}: ${timestamps.length} times`;
-      // const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-      // months.forEach((month, index) => {
-      //   const count = timestamps.filter(timestamp => (new Date(timestamp)).getMonth() == index).length;
-      //   summary = summary + `,${count} times in ${month}`;
-      // })
-      // const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-      // days.forEach((day, index) => {
-      //   const count = timestamps.filter(timestamp => (new Date(timestamp)).getDay() == index).length;
-      //   summary = summary + `,${count} times on ${day}`;
-      // })
+      const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      months.forEach((month, index) => {
+        const count = timestamps.filter(timestamp => (new Date(timestamp)).getMonth() == index).length;
+        if (count > 0) summary = summary + `,${count} times in ${month}`;
+      })
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      days.forEach((day, index) => {
+        const count = timestamps.filter(timestamp => (new Date(timestamp)).getDay() == index).length;
+        if (count > 0) summary = summary + `,${count} times on ${day}`;
+      })
       md.push(summary);
     })
   }

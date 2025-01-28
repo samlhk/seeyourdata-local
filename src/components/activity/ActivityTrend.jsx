@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Chart } from 'chart.js/auto';
 import { Line } from "react-chartjs-2";
+import InfoCard from '../InfoCard';
 
 
 const ActivityTrend = ({ db, colors, filterBar = true }) => {
@@ -65,7 +66,13 @@ const ActivityTrend = ({ db, colors, filterBar = true }) => {
   return (
     monthlyActivities && timeRange ?
     <div>
-      <h4>Activity</h4>
+      <InfoCard 
+        title='Activity'
+        description='Your monthly activity for various apps'
+        benefits='Platforms may collect this information to understand how you use them.'
+        sources={['From Instagram: Off Meta activities, which include time stamps representing "a summary of activity that businesses and organisations share with us about your interactions with them, such as visiting their apps or websites", read more here at https://www.facebook.com/help/2207256696182627', 
+        'From Google: Apps you might have used through Google store']}
+      />
 
       {filterBar && <div className='filter-bar'>
         <div>View apps</div>
