@@ -8,6 +8,7 @@ import InstagramMessageHeatMap from './InstagramMessageHeatMap';
 import { colorScheme } from '../../App';
 import shuffleSeed from 'shuffle-seed';
 import InstagramMessageTimes from './InstagramMessageTimes';
+import Summary from '../ai/Summary';
 
 
 const Instagram = ({ db, isHome }) => {
@@ -25,6 +26,7 @@ const Instagram = ({ db, isHome }) => {
         </div>: <></>) :
       <>
         <InstagramActivity db = { db } colors = { shuffleSeed.shuffle(colorScheme[1], 'k') }/>
+        <Summary db = { db } category='Instagram usage'/>
         <InstagramAccounts db = { db } category='ViewedAccounts' medias={['ads', 'posts', 'suggested profiles', 'videos']} title='Views on accounts' colors={ shuffleSeed.shuffle(colorScheme[0], 'l') }/>
         <InstagramAccounts db = { db } category='CommentedAccounts' medias={['posts', 'reels']} title='Comments on accounts' colors={ shuffleSeed.shuffle(colorScheme[0], 't') }/>
         <InstagramAccounts db = { db } category='LikedAccounts' medias={['posts', 'comments', 'stories']} title='Liked accounts' colors={ shuffleSeed.shuffle(colorScheme[0], 'p') }/>

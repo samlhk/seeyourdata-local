@@ -6,6 +6,7 @@ import ActivityHeatMap from './ActivityHeatMap';
 import { colorScheme } from '../../App';
 import shuffleSeed from 'shuffle-seed';
 import ActivityTimes from './ActivityTimes';
+import Summary from '../ai/Summary';
 
 
 const Activity = ({ db, isHome }) => {
@@ -23,6 +24,7 @@ const Activity = ({ db, isHome }) => {
         </div>: <></>) :
       <>
         <ActivityTrend db = { db } colors = { shuffleSeed.shuffle(colorScheme[0], 'a') }/>
+        <Summary db = { db } category='Activity'/>
         <ActivityHeatMap db = { db }/>
         <ActivityTimes db = { db }/>
       </>

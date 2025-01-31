@@ -6,6 +6,7 @@ import shuffleSeed from 'shuffle-seed';
 import GoogleActivity from './GoogleActivity';
 import GoogleRanking from './GoogleRanking';
 import InterestsWordCloud from '../interests/InterestsWordCloud';
+import Summary from '../ai/Summary';
 
 
 const Google = ({ db, isHome }) => {
@@ -23,6 +24,7 @@ const Google = ({ db, isHome }) => {
         </div>: <></>) :
       <>
         <GoogleActivity db = { db } colors = { colorScheme[2] }/>
+        <Summary db = { db } category='Google products usage' />
         <GoogleRanking db = { db } category='sites' title='Most visited sites'/>
         <GoogleRanking db = { db } category='youtubeWatchedChannels' title='YouTube most watched channels'/>
         <InterestsWordCloud db = { db } type='youtubeWatchedTopics' title='Topics you have watched on YouTube' />

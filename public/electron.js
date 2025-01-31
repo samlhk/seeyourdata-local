@@ -77,10 +77,10 @@ app.on("ready", async () => {
   ipcMain.handle('read-chats', async (event, arg) => {
     try {
       const data = fs.readFileSync(path.join(app.getPath('userData'), 'chats.json'), 'utf8');
-      return data ? JSON.parse(data) : {chats: []};
+      return data ? JSON.parse(data) : {chats: [], summaries: {}};
     } catch (err) {
       console.error(err);
-      return {chats: []}
+      return {chats: [], summaries: {}}
     }
   })
 
@@ -112,7 +112,9 @@ app.on("ready", async () => {
 
   ipcMain.handle('ask', async (event, query) => {
     try {
-      const promptText = `You are an AI chatbot in an application that discovers for users what online platforms know about them, you have read through a user's data downloads from online platforms in the context tags below, please answer their question based on their data summary in the context tags
+      console.log('Answering question');
+      const promptText = 
+      `You are an AI chatbot in an application that discovers for users what online platforms know about them, you have read through a user's data downloads from online platforms in the context tags below, please answer their question based on their data summary in the context tags, please try your best to give a specific answer and useful insights for the user
         <context>{context}</context>
         question: {input}
       `;
@@ -128,6 +130,34 @@ app.on("ready", async () => {
         retriever
       })
       const result = await retrievalChain.invoke({ input: query });
+      console.log(result);
+      return result.answer;
+
+    } catch (err) {
+      console.error(err);
+    }
+  })
+
+  ipcMain.handle('summarise', async (event, category) => {
+    try {
+      console.log(`Summarising ${category}`);
+      const promptText = 
+      `Please produce a summary of a user's data based on their data summary in the context tags, on the category provided in the question, please try your best to give a comprehensive and specific summary and useful insights for the user
+        <context>{context}</context>
+        question: {input}
+      `;
+      const mRetrieval = await import("langchain/chains/retrieval");
+      const mCombineDocuments = await import("langchain/chains/combine_documents");
+      const prompt = mPrompts.ChatPromptTemplate.fromTemplate(promptText);
+      const documentChain = await mCombineDocuments.createStuffDocumentsChain({
+        llm: model,
+        prompt
+      });
+      const retrievalChain = await mRetrieval.createRetrievalChain({
+        combineDocsChain: documentChain,
+        retriever
+      })
+      const result = await retrievalChain.invoke({ input: category });
       console.log(result);
       return result.answer;
 

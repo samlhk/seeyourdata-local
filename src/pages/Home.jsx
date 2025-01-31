@@ -5,7 +5,7 @@ import Interests from '../components/interests/Interests';
 import JSZip from 'jszip';
 import { FaInfoCircle } from "react-icons/fa";
 import { Tooltip } from 'react-tooltip'
-import Dialogue from '../components/Dialogue';
+import Dialogue from '../components/ai/Dialogue';
 import Instagram from '../components/instagram/Instagram';
 import Pi from '../components/pi/Pi';
 import Card from '../components/Card';

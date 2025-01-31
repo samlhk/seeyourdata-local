@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import InterestsWordCloud from './InterestsWordCloud';
 import InterestsWordCloudRefresh from './InterestsWordCloudRefresh';
 import SentimentDistribution from './SentimentDistribution';
+import Summary from '../ai/Summary';
 
 const Interests = ({ db, isHome }) => {
 
@@ -25,6 +26,7 @@ const Interests = ({ db, isHome }) => {
         <SentimentDistribution db = { db } type='messagedSentiment' title='Sentiment scores from private messages' />
         <InterestsWordCloudRefresh db = { db } type='advertisers' title='Your advertisers' />
         <InterestsWordCloudRefresh db = { db } type='recommendedTopics' title='Topics for content recommendations' />
+        <Summary db = { db } category='Interests'/>
         <InterestsWordCloud db = { db } type='searchedTopics' title='Topics you have searched for' />
         <InterestsWordCloud db = { db } type='viewedTopics' title='Topics you have viewed' />
       </>

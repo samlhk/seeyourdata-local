@@ -6,6 +6,7 @@ import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import { FaLongArrowAltRight } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import LocationMap from './LocationMap';
+import Summary from '../ai/Summary';
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -28,6 +29,7 @@ const Location = ( { db, isHome }) => {
         </div> : <></>) :
       <>
         <LocationMap db = { db }/>
+        <Summary db = { db } category='Location'/>
       </>
   )
 }

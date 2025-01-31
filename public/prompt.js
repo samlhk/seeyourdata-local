@@ -3,45 +3,59 @@ const jsonToMd = (json) => {
 
   if (json.activity) {
     json.activity.forEach(({app, timestamps}) => {
-      let summary = '';
-      summary = summary + `user accessed the service: ${app}: ${timestamps.length} times`;
-      const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-      months.forEach((month, index) => {
-        const count = timestamps.filter(timestamp => (new Date(timestamp)).getMonth() == index).length;
-        if (count > 0) summary = summary + `,${count} times in ${month}`;
-      })
-      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-      days.forEach((day, index) => {
-        const count = timestamps.filter(timestamp => (new Date(timestamp)).getDay() == index).length;
-        if (count > 0) summary = summary + `,${count} times on ${day}`;
-      })
-      md.push(summary);
+      if (!app.includes('instagram: chats with')) {
+        let summary = '';
+        summary = summary + `user accessed the service: ${app}: ${timestamps.length} times`;
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        months.forEach((month, index) => {
+          const count = timestamps.filter(timestamp => (new Date(timestamp)).getMonth() == index).length;
+          if (count > 0) summary = summary + `,${count} times in ${month}`;
+        })
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        days.forEach((day, index) => {
+          const count = timestamps.filter(timestamp => (new Date(timestamp)).getDay() == index).length;
+          if (count > 0) summary = summary + `,${count} times on ${day}`;
+        })
+        md.push(summary);
+      }
     })
   }
 
   if (json.location) {
     json.location.forEach(({label, source}) => {
-      md.push(`user accessed location: ${label} through source: ${source}`);
+      if (!label.includes('IP: ')) md.push(`user accessed location: ${label} through source: ${source}`);
     })
   }
 
-  if (json.postedTopics) { 
-    md.push(`the content the user has posted include the following topics: ${json.postedTopics.map(({topic}) => topic)}`);
+  if (json.postedContent) { 
+    json.postedContent.forEach(({source, texts}) => {
+      md.push(`the user has posted the following content thorugh ${source}: ${texts}`);
+    })
   }
+  
+  // if (json.postedTopics) { 
+  //   md.push(`the content the user has posted include the following topics: ${json.postedTopics.map(({topic}) => topic)}`);
+  // }
 
   if (json.postedSentiment) {
     json.postedSentiment.forEach(({source, sentiments}) => {
-      md.push(`the content the user has posted on ${source} has the average sentiment score: ${sentiments.reduce((a, b) => a + b, 0) / sentiments.length}`);
+      md.push(`the content the user has posted on ${source} has the average sentiment score (lowest: -5, highest: 5): ${sentiments.reduce((a, b) => a + b, 0) / sentiments.length}`);
     })
   }
 
-  if (json.messagedTopics) { 
-    md.push(`the user's messages include the following topics: ${json.messagedTopics.map(({topic}) => topic)}`);
+  if (json.messagedContent) { 
+    json.messagedContent.forEach(({source, texts}) => {
+      md.push(`the user has made the following messages thorugh ${source}: ${texts}`);
+    })
   }
+
+  // if (json.messagedTopics) { 
+  //   md.push(`the user's messages include the following topics: ${json.messagedTopics.map(({topic}) => topic)}`);
+  // }
 
   if (json.messagedSentiment) {
     json.messagedSentiment.forEach(({source, sentiments}) => {
-      md.push(`the user's messages on ${source} has the average sentiment score: ${sentiments.reduce((a, b) => a + b, 0) / sentiments.length}`);
+      md.push(`the user's messages on ${source} has the average sentiment score (lowest: -5, highest: 5): ${sentiments.reduce((a, b) => a + b, 0) / sentiments.length}`);
     })
   }
 
@@ -57,13 +71,25 @@ const jsonToMd = (json) => {
     })
   }
 
-  if (json.searchedTopics) { 
-    md.push(`the user has searched for the following topics: ${json.searchedTopics.map(({topic}) => topic)}`);
+  if (json.searchedContent) { 
+    json.searchedContent.forEach(({source, texts}) => {
+      md.push(`the user has searched the following information through ${source}: ${texts}`);
+    })
   }
 
-  if (json.viewedTopics) { 
-    md.push(`the user has viewed content related the following topics: ${json.viewedTopics.map(({topic}) => topic)}`);
+  // if (json.searchedTopics) { 
+  //   md.push(`the user has searched for the following topics: ${json.searchedTopics.map(({topic}) => topic)}`);
+  // }
+
+  if (json.viewedContent) { 
+    json.viewedContent.forEach(({source, texts}) => {
+      md.push(`the user has viewed the following content through ${source}: ${texts}`);
+    })
   }
+
+  // if (json.viewedTopics) { 
+  //   md.push(`the user has viewed content related the following topics: ${json.viewedTopics.map(({topic}) => topic)}`);
+  // }
 
   if (json.piPhone) {
     json.piPhone.forEach(({source, list}) => {

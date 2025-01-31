@@ -7,5 +7,6 @@ contextBridge.exposeInMainWorld('api', {
     writeChats: (json) => ipcRenderer.invoke('write-chats', json),
     getDBPath: () => ipcRenderer.invoke('get-db-path'),
     ipsToLatlong: (ips) => ipcRenderer.invoke('ips-to-latlong', ips),
-    ask: (query) => ipcRenderer.invoke('ask', query)
+    ask: (query) => ipcRenderer.invoke('ask', query),
+    summarise: (category) => ipcRenderer.invoke('summarise', category)
 })
