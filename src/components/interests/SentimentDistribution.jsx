@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Chart } from 'chart.js/auto';
 import { Bar } from "react-chartjs-2";
+import InfoCard from '../InfoCard';
 
 
-const SentimentDistribution = ({ db, type, title, filterBar = true }) => {
+const SentimentDistribution = ({ db, type, title, description, benefits, harms, sources, filterBar = true }) => {
 
   const [data, setData] = useState(null);
   const [selectedSource, setSelectedSource] = useState(null);
@@ -35,7 +36,7 @@ const SentimentDistribution = ({ db, type, title, filterBar = true }) => {
   return (
     data ?
     <div>
-      <h4>{title}</h4>
+      <InfoCard title={title} description={description} benefits={benefits} harms={harms} sources={sources}/>
 
       {filterBar && <div className='filter-bar'>
         <div>Select source</div>

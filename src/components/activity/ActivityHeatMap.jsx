@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import HeatMap from '@uiw/react-heat-map';
 import Tooltip from '@uiw/react-tooltip';
+import InfoCard from '../InfoCard';
 
 
 const ActivityHeatMap = ({ db, filterBar = true }) => {
@@ -50,7 +51,16 @@ const ActivityHeatMap = ({ db, filterBar = true }) => {
   return (
     value && yearRange && selectedApp ?
     <div className='heatmap-container'>
-      <h4><strong>{selectedApp}</strong>: usage heat map</h4>
+      <InfoCard
+        title={`${selectedApp}: usage heat map`}
+        description='Your daily activity for your selected app, the selection defaults to your most frequent activity'
+        benefits='Platforms may collect this information to understand how you use them or for diagnostics, this data is generally stored in the form of time stamps of your access times'
+        harms='Platforms may use this data to target advertisments at you at certain times of the year'
+        sources={[
+          'Off Meta activities from Instagram: which include timestamps representing "a summary of activity that businesses and organisations share with Meta about your interactions with them, such as visiting their apps or websites", read more here at https://www.facebook.com/help/2207256696182627',
+          'App activity through Google Play Store'
+        ]}
+      />
 
       {filterBar && <div className='filter-bar'>
         <div>Select app</div>

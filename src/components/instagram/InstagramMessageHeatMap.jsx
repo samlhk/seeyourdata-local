@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import HeatMap from '@uiw/react-heat-map';
 import Tooltip from '@uiw/react-tooltip';
+import InfoCard from '../InfoCard';
 
 
 const InstagramMessageHeatMap = ({ db, filterBar = true }) => {
@@ -50,7 +51,12 @@ const InstagramMessageHeatMap = ({ db, filterBar = true }) => {
   return (
     value && yearRange && selectedApp ?
     <div className='heatmap-container'>
-      <h4><strong>{selectedApp}</strong>: message activity heat map</h4>
+      <InfoCard
+        title={`${selectedApp}: message activity heat map`}
+        description='Your daily Instagram messaging activity with the selected account, the selection defaults to all chats and messages aggregated, note that this data only represents the messages you sent'
+        benefits='Instagram stores your message times for your record'
+        sources={['Instagram activity: messages']}
+      />
 
       {filterBar && <div className='filter-bar'>
         <div>Select chat</div>

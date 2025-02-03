@@ -68,10 +68,12 @@ const ActivityTrend = ({ db, colors, filterBar = true }) => {
     <div>
       <InfoCard 
         title='Activity'
-        description='Your monthly activity for various apps'
-        benefits='Platforms may collect this information to understand how you use them.'
-        sources={['From Instagram: Off Meta activities, which include time stamps representing "a summary of activity that businesses and organisations share with us about your interactions with them, such as visiting their apps or websites", read more here at https://www.facebook.com/help/2207256696182627', 
-        'From Google: Apps you might have used through Google store']}
+        description='Your monthly activity for various apps, you may select up to 7 apps to compare their activity, the selection defaults to the top 7 apps you have used'
+        benefits='Platforms may collect this information to understand how you use them or for diagnostics, this data is generally stored in the form of time stamps of your access times'
+        sources={[
+          'Off Meta activities from Instagram: which include timestamps representing "a summary of activity that businesses and organisations share with Meta about your interactions with them, such as visiting their apps or websites", read more here at https://www.facebook.com/help/2207256696182627',
+          'App activity through Google Play Store'
+        ]}
       />
 
       {filterBar && <div className='filter-bar'>

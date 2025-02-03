@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Chart } from 'chart.js/auto';
 import { Line } from "react-chartjs-2";
+import InfoCard from '../InfoCard';
 
 
 const GoogleActivity = ({ db, colors, filterBar = true }) => {
@@ -65,7 +66,12 @@ const GoogleActivity = ({ db, colors, filterBar = true }) => {
   return (
     monthlyActivities && timeRange ?
     <div>
-      <h4>Google Activity</h4>
+      <InfoCard
+        title='Google Activity'
+        description='Your monthly activity for activities on Google products, you may select up to 7 products to compare them, the selection defaults to the top 7 products you have interacted with'
+        benefits='Google stores your activity with timestamps attached, this can help you understand what you have done on the platform and when'
+        sources={['Google MyActivity']}
+      />
 
       {filterBar && <div className='filter-bar'>
         <div>View activities</div>

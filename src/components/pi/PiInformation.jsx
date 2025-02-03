@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import InfoCard from '../InfoCard';
 
 const PiInformation = ({ db }) => {
 
@@ -30,7 +31,12 @@ const PiInformation = ({ db }) => {
   return (
     pis && pis.find(list => list.length > 0) ?
     <div>
-      <h4>Personal Information</h4>
+      <InfoCard
+        title='Personal Information'
+        benefits='Platforms may store your personal information for record purposes, or you may have provided this when you signed up'
+        harms='Misuse or leaks of personal information may pose privacy risks'
+        sources={['Instagram personal information and login activity']}
+      />
       <table>
         {
           pis.map((pi, index) => pi.length > 0 ? 

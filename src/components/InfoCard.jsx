@@ -21,7 +21,7 @@ const InfoCard = ({title, description, benefits, harms, sources, content}) => {
             {description && <><h5>Description</h5>{description}</>}
             {benefits && <><h5>Potential Benefits</h5>{benefits}</>}
             {harms && <><h5>Potential Harms</h5>{harms}</>}
-            {sources && <><h5>Where we found this data</h5>{sources.map(source => <div>{source}</div>)}</>}
+            {sources && <><h5>Where we found this data</h5>{sources.map(source => <><br/><div>{source}</div></>)}</>}
             {content}
           </>
         } toggleCard={toggleCard} />

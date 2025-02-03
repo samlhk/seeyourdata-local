@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Chart } from 'chart.js/auto';
 import { Bar } from "react-chartjs-2";
+import InfoCard from '../InfoCard';
 
 
-const InstagramAccounts = ({ db, category, medias, title, colors, filterBar = true }) => {
+const InstagramAccounts = ({ db, category, medias, title, description, colors, filterBar = true }) => {
 
   const [accounts, setAccounts] = useState(null);
   const [categories, setCategories] = useState(null);
@@ -44,7 +45,13 @@ const InstagramAccounts = ({ db, category, medias, title, colors, filterBar = tr
   return (
     accounts && categories ?
     <div>
-      <h4>{title}</h4>
+      <InfoCard
+        title={title}
+        description={`The top 10 ${description}, you can select different types of Instagram features you have interacted with and it will show you the top 10 accounts for those`}
+        benefits='This information is inherently stored by Instagram as it is one of its core feature as a social media app, it can be used to recommend content that you enjoy'
+        harms='Your interactions with various accounts may show your interests, potentially leading to targetted marketing'
+        sources={['Instagram activity']}
+      />
 
       {filterBar && <div className='filter-bar'>
         <div>Filter by media</div>

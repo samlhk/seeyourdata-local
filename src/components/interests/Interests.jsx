@@ -20,15 +20,38 @@ const Interests = ({ db, isHome }) => {
           <InterestsWordCloud db = { db } type='postedTopics' title='Topics from posted content' />
         </div> : <></>) :
       <>
-        <InterestsWordCloud db = { db } type='postedTopics' title='Topics from posted content' />
-        <SentimentDistribution db = { db } type='postedSentiment' title='Sentiment scores from posted content' />
-        <InterestsWordCloud db = { db } type='messagedTopics' title='Topics from private messages' />
-        <SentimentDistribution db = { db } type='messagedSentiment' title='Sentiment scores from private messages' />
-        <InterestsWordCloudRefresh db = { db } type='advertisers' title='Your advertisers' />
-        <InterestsWordCloudRefresh db = { db } type='recommendedTopics' title='Topics for content recommendations' />
+        <InterestsWordCloud db = { db } type='postedTopics' title='Topics from posted content' 
+          description='Topics from content you have posted publicly, generated with LDA topic modelling'
+          benefits='Platforms may use this to understand your views and recommend content that you are more interested in'
+          sources={['Instagram post and reel comments']}
+        />
+        <SentimentDistribution db = { db } type='postedSentiment' title='Sentiment scores from posted content'
+          description='Sentiment scores from content you have posted publicly, generated with AFINN-based sentiment analysis, ranges from -5 to 5'
+          sources={['Instagram post and reel comments']}  
+        />
+        <InterestsWordCloud db = { db } type='messagedTopics' title='Topics from private messages'
+          description='Topics from your private messages, generated with LDA topic modelling'
+        />
+        <SentimentDistribution db = { db } type='messagedSentiment' title='Sentiment scores from private messages'
+          description='Sentiment scores from your private messages, generated with AFINN-based sentiment analysis, ragnes from -5 to 5'
+        />
+        <InterestsWordCloudRefresh db = { db } type='advertisers' title='Your advertisers'
+          description='Advertisers using your activity or information'
+          sources={['Instagram advertisers']}
+        />
+        <InterestsWordCloudRefresh db = { db } type='recommendedTopics' title='Topics for content recommendations' 
+          description='Your topics, determined by online platforms'
+          sources={['Instagram topics: "A collection of topics determined by your activity on Instagram that is used to create recommendations for you in different areas of Instagram, such as Reels, feed recommendations, and Shopping"']}
+        />
         <Summary db = { db } category='Interests'/>
-        <InterestsWordCloud db = { db } type='searchedTopics' title='Topics you have searched for' />
-        <InterestsWordCloud db = { db } type='viewedTopics' title='Topics you have viewed' />
+        <InterestsWordCloud db = { db } type='searchedTopics' title='Topics you have searched for'
+          description='Topics from your searches through the online platforms, generated with LDA topic modelling'
+          sources={['Searches on Google products: YouTube, Chrome, Flights, Hotels, Image Search, Search, Shopping']}
+        />
+        <InterestsWordCloud db = { db } type='viewedTopics' title='Topics you have viewed' 
+          description={'Topics from things you have viewed through online platforms, generated with LDA topic modelling'}
+          sources={['Views through Google products: Ads, Chrome']}
+        />
       </>
   )
 }

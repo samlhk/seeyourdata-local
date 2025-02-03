@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
+import InfoCard from '../InfoCard';
+import Prompter from './Prompter';
 
 const Dialogue = ({ db, isHome }) => {
 
@@ -51,11 +53,51 @@ const Dialogue = ({ db, isHome }) => {
     setChatId(null);
   }
 
+  const populatePrompt = (prompt) => {
+    setPrompt(prompt);
+  }
+
   return (
     db && Object.keys(db).length > 0 ?
       <div className='dialogue-container'>
         <div>
-          <h4>Ask about your data</h4>
+          <InfoCard
+            title='Ask about your data'
+            content={
+              <>
+                <h5>How it works</h5>
+                  <div>
+                    The local AI LLM chatbot is trained on your data and can answer your questions on things about your data <br/>
+                    It may take some time to generate an answer depending on your device, you may find closing other programs makes the AI run faster<br/>
+                    It may fail to generate a answer or if the answer does not make sense, you can re-open the app and try again.<br/>
+                    It is important to note the answers are generated with AI and may not be accurate, care should be taken when processing the information generated<br/>
+                    Due to the small size of the local LLM, there are limitations in the level of inference it can produce and you may have to probe more times to get answers you want
+                  </div>
+                <h5>Sample questions</h5>
+                  <h6>Insights</h6>
+                  <Prompter prompt='What are my general views, tell me however many you can find.' setPrompt={setPrompt}/>
+                  <Prompter prompt='What can you infer about my personality, am I more extroverted or introverted?' setPrompt={setPrompt}/>
+                  <Prompter prompt='What are my political views?' setPrompt={setPrompt}/>
+                  <Prompter prompt='Who do you think I am, as in where am I fromm what do I do, give me as much information you can infer from my data.' setPrompt={setPrompt}/><br/>
+                  <h6>Activity</h6>
+                  <Prompter prompt='What apps do I use the most?' setPrompt={setPrompt}/>
+                  <Prompter prompt='How do I use different apps?' setPrompt={setPrompt}/>
+                  <Prompter prompt='How do I use different apps and websites?' setPrompt={setPrompt}/>
+                  <Prompter prompt='What do I use different online platforms for?' setPrompt={setPrompt}/><br/>
+                  <h6>Location</h6>
+                  <Prompter prompt='Where am I located in?' setPrompt={setPrompt}/>
+                  <Prompter prompt='What places have I been to?' setPrompt={setPrompt}/><br/>
+                  <h6>Instagram</h6>
+                  <Prompter prompt='How do I use different Instagram services?' setPrompt={setPrompt}/>
+                  <Prompter prompt='What things do I post on social media?' setPrompt={setPrompt}/>
+                  <Prompter prompt='What can you infer about me based on my messages?' setPrompt={setPrompt}/>
+                  <Prompter prompt='Who do I interact with the most on Instagram throughout the past years?' setPrompt={setPrompt}/><br/>
+                  <h6>Google</h6>
+                  <Prompter prompt='How do I use different Google services, including YouTube?' setPrompt={setPrompt}/>
+                  <Prompter prompt='What kind of things do I browse on the Internet and different online platforms?' setPrompt={setPrompt}/><br/>
+              </>
+            }
+          />
 
           {<div className='filter-bar'>
             <button disabled={humanChats.length === 0} onClick={() => {setAiChats([defaultAiPrompt]); setHumanChats([]); setChatId(null); document.getElementById('chat-filter').value = -1;}}>New Chat</button>

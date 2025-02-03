@@ -23,8 +23,8 @@ button.highlighted {
 
 .card-container {
   position: fixed;
-  z-index: 100;
-  background: lightgray;
+  z-index: 9999;
+  background: #b3ebf2;
   overflow-x: hidden;
   overflow-y: scroll;
   overscroll-behavior: contain;

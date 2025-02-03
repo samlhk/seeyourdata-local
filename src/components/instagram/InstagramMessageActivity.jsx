@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Chart } from 'chart.js/auto';
 import { Line } from "react-chartjs-2";
+import InfoCard from '../InfoCard';
 
 
 const InstagramMessageActivity = ({ db, colors, filterBar = true }) => {
@@ -65,7 +66,12 @@ const InstagramMessageActivity = ({ db, colors, filterBar = true }) => {
   return (
     monthlyActivities && timeRange ?
     <div>
-      <h4>Chat and message activity</h4>
+      <InfoCard
+        title='Chat and message activity'
+        description='Your monthly Instagram messaging activity with different accounts, you may select up to 7 accounts to compare them, the selection defaults to the top 7 accounts you have messaged with, note that this data only represents the messages you sent'
+        benefits='Instagram stores your message times for your record'
+        sources={['Instagram activity: messages']}
+      />
 
       {filterBar && <div className='filter-bar'>
         <div>View chats</div>

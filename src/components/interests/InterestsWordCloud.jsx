@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import ReactWordCloud from 'react-wordcloud';
+import InfoCard from '../InfoCard';
 
-const InterestsWordCloud = ({ db, type, title }) => {
+const InterestsWordCloud = ({ db, type, title, description, benefits, harms, sources }) => {
   
   const [topics, setTopics] = useState();
 
@@ -22,7 +23,7 @@ const InterestsWordCloud = ({ db, type, title }) => {
   return (
     topics ?
     <div className='interests-container'>
-      <h4>{title}</h4>
+      <InfoCard title={title} description={description} benefits={benefits} harms={harms} sources={sources}/>
       <ReactWordCloud 
         words={topics}
         options={{rotations: 1, rotationAngles: [0, 0]}} />

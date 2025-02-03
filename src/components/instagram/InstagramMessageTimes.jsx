@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Chart } from 'chart.js/auto';
 import { Pie } from "react-chartjs-2";
 import { colorScheme } from '../../App';
+import InfoCard from '../InfoCard';
 
 
 const InstagramMessageTimes = ({ db, filterBar = true }) => {
@@ -50,7 +51,12 @@ const InstagramMessageTimes = ({ db, filterBar = true }) => {
   return (
     timeRanges && activityCounts && selectedApp ?
     <div>
-      <h4><strong>{selectedApp}</strong>: messaging hours</h4>
+      <InfoCard
+        title={`${selectedApp}: messaging hours`}
+        description='Your Instagram messaging hour distribution for your selected account, the selection defaults to all chats and messages aggregated, note that the data only represents messages you sent'
+        benefits='Instagram stores your message times for your record'
+        sources={['Instagram activity: messages']}
+      />
 
       {filterBar && <div className='filter-bar'>
         <div>Select chat</div>

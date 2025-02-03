@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import ReactWordCloud from 'react-wordcloud';
 import _ from 'underscore';
+import InfoCard from '../InfoCard';
 
-const InterestsWordCloudRefresh = ({ db, type, title, filterBar = true }) => {
+const InterestsWordCloudRefresh = ({ db, type, title, description, benefits, harms, sources, filterBar = true }) => {
   
   const [topics, setTopics] = useState();
 
@@ -23,7 +24,7 @@ const InterestsWordCloudRefresh = ({ db, type, title, filterBar = true }) => {
   return (
     topics ?
     <div className='interests-container'>
-      <h4>{title}</h4>
+      <InfoCard title={title} description={description} benefits={benefits} harms={harms} sources={sources}/>
 
       {filterBar && <div className='filter-bar'>
         <div></div>

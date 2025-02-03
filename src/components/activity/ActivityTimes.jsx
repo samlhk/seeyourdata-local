@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Chart } from 'chart.js/auto';
 import { Pie } from "react-chartjs-2";
 import { colorScheme } from '../../App';
+import InfoCard from '../InfoCard';
 
 
 const ActivityTimes = ({ db, filterBar = true }) => {
@@ -50,7 +51,16 @@ const ActivityTimes = ({ db, filterBar = true }) => {
   return (
     timeRanges && activityCounts && selectedApp ?
     <div>
-      <h4><strong>{selectedApp}</strong>: usage hours</h4>
+      <InfoCard
+        title={`${selectedApp}: usage hours`}
+        description='Your usage hour distribution for your selected app, the selection defaults to your most frequent activity'
+        benefits='Platforms may collect this information to understand how you use them or for diagnostics, this data is generally stored in the form of time stamps of your access times'
+        harms='Platforms may use this data to target advertisments at you at certain times'
+        sources={[
+          'Off Meta activities from Instagram: which include timestamps representing "a summary of activity that businesses and organisations share with Meta about your interactions with them, such as visiting their apps or websites", read more here at https://www.facebook.com/help/2207256696182627',
+          'App activity through Google Play Store'
+        ]}
+      />
 
       {filterBar && <div className='filter-bar'>
         <div>Select app</div>

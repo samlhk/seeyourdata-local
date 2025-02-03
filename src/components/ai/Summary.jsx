@@ -35,6 +35,17 @@ const Summary = ({ db, category }) => {
     <div>
       <InfoCard 
         title={`${category} summary`}
+        content={
+          <>
+            <h5>How it works</h5>
+              <div>
+                When you press the "Generate summary" button, the local AI LLM chatbot generates a summary of your {category} data<br/>
+                This may take some time depending on your device, you may find closing other programs makes the AI run faster<br/>
+                It may fail to generate a summary, if you see this message, you can re-open the app and try again.<br/>
+                It is important to note the content generated is AI generated and may not be accurate, care should be taken when processing the information generated
+              </div>
+          </>
+        }
       />
       <div className='filter-bar'>
         <div></div>

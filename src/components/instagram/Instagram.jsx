@@ -27,10 +27,10 @@ const Instagram = ({ db, isHome }) => {
       <>
         <InstagramActivity db = { db } colors = { shuffleSeed.shuffle(colorScheme[1], 'k') }/>
         <Summary db = { db } category='Instagram usage'/>
-        <InstagramAccounts db = { db } category='ViewedAccounts' medias={['ads', 'posts', 'suggested profiles', 'videos']} title='Views on accounts' colors={ shuffleSeed.shuffle(colorScheme[0], 'l') }/>
-        <InstagramAccounts db = { db } category='CommentedAccounts' medias={['posts', 'reels']} title='Comments on accounts' colors={ shuffleSeed.shuffle(colorScheme[0], 't') }/>
-        <InstagramAccounts db = { db } category='LikedAccounts' medias={['posts', 'comments', 'stories']} title='Liked accounts' colors={ shuffleSeed.shuffle(colorScheme[0], 'p') }/>
-        <InstagramAccounts db = { db } category='StoryInteractedAccounts' medias={['emoji sliders', 'polls', 'questions', 'quizzes', 'countdowns']} title='Story interaction accounts' colors={ shuffleSeed.shuffle(colorScheme[0], 'e') }/>
+        <InstagramAccounts db = { db } category='ViewedAccounts' medias={['ads', 'posts', 'suggested profiles', 'videos']} title='Views on accounts' description='Instagram accounts you have viewed' colors={ shuffleSeed.shuffle(colorScheme[0], 'l') }/>
+        <InstagramAccounts db = { db } category='CommentedAccounts' medias={['posts', 'reels']} title='Comments on accounts' description='Instagram accounts you have commented on' colors={ shuffleSeed.shuffle(colorScheme[0], 't') }/>
+        <InstagramAccounts db = { db } category='LikedAccounts' medias={['posts', 'comments', 'stories']} title='Liked accounts' description='Instagram accounts you have liked' colors={ shuffleSeed.shuffle(colorScheme[0], 'p') }/>
+        <InstagramAccounts db = { db } category='StoryInteractedAccounts' medias={['emoji sliders', 'polls', 'questions', 'quizzes', 'countdowns']} title='Story interaction accounts' description='Instagram accounts which stories you have interacted with' colors={ shuffleSeed.shuffle(colorScheme[0], 'e') }/>
         <InstagramMessageActivity db = { db } colors = { shuffleSeed.shuffle(colorScheme[1], 'p') }/>
         <InstagramMessageHeatMap db = { db }/>
         <InstagramMessageTimes db = { db }/>

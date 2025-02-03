@@ -4,6 +4,7 @@ import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
 import "leaflet/dist/leaflet.css";
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import InfoCard from '../InfoCard';
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -45,7 +46,13 @@ const LocationMap = ( { db, filterBar = true }) => {
   return (
     locations && sources ?
     <div>
-      <h4>Locations{filteredSources.size > 0 && ` (from: ${[...filteredSources].join(', ')})`}</h4>
+      <InfoCard 
+        title={`Locations ${filteredSources.size > 0 ? ` (from: ${[...filteredSources].join(', ')})` : ''}`}
+        description='Location data from your data downloads, these may be locations you have searched for or have been in, generated from IP addresses and more'
+        benefits='Platforms may keep track of your location for recommending and serving content that is more relevant to your location'
+        harms='Location data may pose privacy risks when misused'
+        sources={['Instagram logged in IP addresses', 'Google Maps search history']}
+      />
 
       {filterBar && <div className='filter-bar'>
         <div>Filter source</div>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Chart } from 'chart.js/auto';
 import { Line } from "react-chartjs-2";
+import InfoCard from '../InfoCard';
 
 
 const InstagramActivity = ({ db, colors, filterBar = true }) => {
@@ -65,7 +66,12 @@ const InstagramActivity = ({ db, colors, filterBar = true }) => {
   return (
     monthlyActivities && timeRange ?
     <div>
-      <h4>Instagram Activity</h4>
+      <InfoCard 
+        title='Instagram Activity'
+        description='Your monthly activity for various Instagram activities, you may select up to 7 activities to compare them, the selection defaults to the top 7 activities you have done'
+        benefits='Instagram stores your activity with timestamps attached, this can help you understand what you have done on the platform and when'
+        sources={['Instagram activity']}
+      />
 
       {filterBar && <div className='filter-bar'>
         <div>View activities</div>

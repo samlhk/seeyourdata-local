@@ -25,9 +25,22 @@ const Google = ({ db, isHome }) => {
       <>
         <GoogleActivity db = { db } colors = { colorScheme[2] }/>
         <Summary db = { db } category='Google products usage' />
-        <GoogleRanking db = { db } category='sites' title='Most visited sites'/>
-        <GoogleRanking db = { db } category='youtubeWatchedChannels' title='YouTube most watched channels'/>
-        <InterestsWordCloud db = { db } type='youtubeWatchedTopics' title='Topics you have watched on YouTube' />
+        <GoogleRanking db = { db } category='sites' title='Most visited sites'
+          description='Your most visited websites on Google Chrome, sorted from most visited to least'
+          benefits='Chrome keep your browsing history for your record and page recommendations in the future'
+          harms='This data may be used for targetted marketing'
+          sources={['Google activity: Chrome']}  
+        />
+        <GoogleRanking db = { db } category='youtubeWatchedChannels' title='YouTube most watched channels'
+          description='Your most watched YouTube channels, sorted from most watched to least'
+          benefits='YouTube keeps your watch history for your record and video recommendations in the future'
+          harms='This data may be used for targetted marketing'
+          sources={['Google activity: YouTube']}
+        />
+        <InterestsWordCloud db = { db } type='youtubeWatchedTopics' title='Topics you have watched on YouTube'
+          description='Topics from things you have watched on YouTube, generated with LDA topic modelling'
+          sources={['Google activity: YouTube videos watched']}
+        />
       </>
   )
 }

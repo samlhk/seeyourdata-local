@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Chart } from 'chart.js/auto';
 import { Bar } from "react-chartjs-2";
+import InfoCard from '../InfoCard';
 
 
-const GoogleRanking = ({ db, category, title, filterBar = true }) => {
+const GoogleRanking = ({ db, category, title, description, benefits, harms, sources, filterBar = true }) => {
 
   const [allItems, setAllItems] = useState(null);
   const [items, setItems] = useState(null);
@@ -55,7 +56,7 @@ const GoogleRanking = ({ db, category, title, filterBar = true }) => {
   return (
     allItems && items && counts ?
     <div>
-      <h4>{title} (top: {displayRange(filteredRangeStart)})</h4>
+      <InfoCard title={`${title} (top: ${displayRange(filteredRangeStart)})`} description={description} benefits={benefits} harms={harms} sources={sources}/>
 
       {filterBar && <div className='filter-bar'>
         <div>Filter range</div>
