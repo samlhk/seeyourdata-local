@@ -11,6 +11,12 @@ nav {
   grid-template-columns: 50% 50%;
 }
 
+@media (max-width: 1250px) {
+  .home-container {
+    grid-template-columns: 100%;
+  }
+}
+
 .home-container > * {
   border: solid black 3px;
   margin: 0.5rem;

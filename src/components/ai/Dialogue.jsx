@@ -78,7 +78,7 @@ const Dialogue = ({ db, isHome }) => {
                   <Prompter prompt='What are my general views, tell me however many you can find.' setPrompt={setPrompt}/>
                   <Prompter prompt='What can you infer about my personality, am I more extroverted or introverted?' setPrompt={setPrompt}/>
                   <Prompter prompt='What are my political views?' setPrompt={setPrompt}/>
-                  <Prompter prompt='Who do you think I am, as in where am I fromm what do I do, give me as much information you can infer from my data.' setPrompt={setPrompt}/><br/>
+                  <Prompter prompt='Who do you think I am, as in where am I from, what do I do, give me as much information you can infer from my data.' setPrompt={setPrompt}/><br/>
                   <h6>Activity</h6>
                   <Prompter prompt='What apps do I use the most?' setPrompt={setPrompt}/>
                   <Prompter prompt='How do I use different apps?' setPrompt={setPrompt}/>
