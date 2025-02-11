@@ -34,7 +34,8 @@ button.highlighted {
   height: 70vh;
   border-radius: 1rem;
   border: solid 5px black;
-  padding:0.5rem;
+  padding: 0.5rem;
+  font-size: 1.2rem;
 }
 
 .card-container::-webkit-scrollbar {

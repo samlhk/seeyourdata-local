@@ -141,6 +141,7 @@ app.on("ready", async () => {
   ipcMain.handle('summarise', async (event, category) => {
     try {
       console.log(`Summarising ${category}`);
+      await setUpLLM();
       const promptText = 
       `Please produce a summary of a user's data based on their data summary in the context tags, on the category provided in the question, please try your best to give a comprehensive and specific summary and useful insights for the user
         <context>{context}</context>
