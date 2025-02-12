@@ -10,13 +10,13 @@ There are 2 ways to run the app
 
 ### Linux (x64)
 
-1. Download the packaged app at [https://drive.google.com/file/d/10v8PfbdPxyTAySWpZaMPtK7DvAX-dUKQ/view?usp=sharing](https://drive.google.com/file/d/10v8PfbdPxyTAySWpZaMPtK7DvAX-dUKQ/view?usp=sharing)
+1. Download the packaged app at [https://drive.google.com/file/d/1htYTIwGi3Ng-uWFkERctRuzXNtJZtDxK/view?usp=sharing](https://drive.google.com/file/d/1htYTIwGi3Ng-uWFkERctRuzXNtJZtDxK/view?usp=sharing)
 2. Extract the folder `seeyourdata-local-linux-x64`
 3. Execute the file `seeyourdata-local` to launch the app, you can click on the file or run `./seeyourdata-local` in the command line
 
 ### Windows (x64)
 
-1. Download the packaged app at [https://drive.google.com/file/d/1gaG8OVRIph8TgdONRD0hgN-iVPybHW2w/view?usp=sharing](https://drive.google.com/file/d/1gaG8OVRIph8TgdONRD0hgN-iVPybHW2w/view?usp=sharing)
+1. Download the packaged app at [https://drive.google.com/file/d/1T1poaVN1AkIvT-B1K5pxbZK37ZcnUei3/view?usp=sharing](https://drive.google.com/file/d/1T1poaVN1AkIvT-B1K5pxbZK37ZcnUei3/view?usp=sharing)
 2. Extract the folder `seeyourdata-local-win32-x64`
 3. (this step is to prevent a Windows error from preventing an unrecognised app from starting, if step 4 works, you may skip this step) Right click on `seeyourdata-local.exe`, select 'Properties', check 'Unblock' next to the security field 
 4. Execute the file `seeyourdata-local.exe` to launch the app, you can click on the file or run `start seeyourdata-local.exe` in the command line
@@ -39,6 +39,5 @@ There are 2 ways to run the app
 4. Run `npm run build`
 6. (Windows only) Change the package command in `package.json` to `electron-packager . --platform=win32 --arch=x64 --overwrite` and run `npm run package`
 7. (Linux only) Run `npm run package`
-8. Go into the generated folder and find `resources/app/build/index.html`, change `"/static/js/main.<hash>.js"` and `"/static/css/main.<hash>.css"` to `"./static/js/main.<hash>.js"` and `"./static/css/main.<hash>.css"` (ignore if already have relative paths)
 9. Follow the steps of running a packaged app above
 
