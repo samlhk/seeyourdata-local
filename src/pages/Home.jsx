@@ -619,12 +619,12 @@ const Home = () => {
                   </div>
                 <h5>Data Accuracy</h5>
                   <div>
-                    While we aim to interperate your data downloads accurately, its lack of documentation and evolving format has made this difficult<br/>
+                    While we aim to interpret your data downloads accurately, its lack of documentation and evolving format has made this difficult<br/>
                     Therefore, information presented in this app, including any description of the data, may not be entirely accurate or interpreted accurately and should not be taken completely at face value<br/>
                   </div>
                 <h5>Bugs and Issues</h5>
                   <div>
-                    This app is developed for research purposes with limited resources, so there are likely bugs present, if you encounter any issues or have any suggestions, feel free to message the us at s2157573@ed.ac.uk<br/>
+                    This app is developed for research purposes with limited resources, so there are likely bugs present, if you encounter any issues or have any suggestions, feel free to message us at s2157573@ed.ac.uk<br/>
                     We apologies for any inconvenience caused and wll be grateful for your contribution to improve the app
                   </div>
               </>
