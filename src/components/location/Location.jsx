@@ -22,6 +22,7 @@ const Location = ( { db, isHome }) => {
     isHome ?
       (db.location ?
         <div className='explore-more-container' onClick={ () => navigate('/location') }>
+          <div className='blocker'></div>
           <div className='explore-more-bar'>
             <button className='explore-more-indicator'>Explore More <FaLongArrowAltRight/></button>
           </div>

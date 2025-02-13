@@ -17,6 +17,7 @@ const Google = ({ db, isHome }) => {
     isHome ? 
       ((db.activity && db.activity.find(({app}) => app.includes('google'))) || db.sites || db.youtubeWatchedChannels || db.youtubeWatchedTopics ?
         <div className='explore-more-container' onClick={ () => navigate('/google') }>
+          <div className='blocker'></div>
           <div className='explore-more-bar'>
             <button className='explore-more-indicator'>Explore More <FaLongArrowAltRight/></button>
           </div>

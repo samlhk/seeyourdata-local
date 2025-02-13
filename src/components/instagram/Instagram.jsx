@@ -19,6 +19,7 @@ const Instagram = ({ db, isHome }) => {
     isHome ? 
       ((db.activity && db.activity.find(({app}) => app.includes('instagram'))) || db.instagramCommentedAccounts || db.instagramViewedAccounts || db.instagramLikedAccounts || db.instagramStoryInteractedAccounts ?
         <div className='explore-more-container' onClick={ () => navigate('/instagram') }>
+          <div className='blocker'></div>
           <div className='explore-more-bar'>
             <button className='explore-more-indicator'>Explore More <FaLongArrowAltRight/></button>
           </div>

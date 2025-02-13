@@ -10,13 +10,13 @@ There are 2 ways to run the app
 
 ### Linux (x64)
 
-1. Download the packaged app at [https://drive.google.com/file/d/1htYTIwGi3Ng-uWFkERctRuzXNtJZtDxK/view?usp=sharing](https://drive.google.com/file/d/1htYTIwGi3Ng-uWFkERctRuzXNtJZtDxK/view?usp=sharing)
+1. Download the packaged app at [https://drive.google.com/file/d/1u64R1oHIU8W7Xiz_qTXvjBffkLAB0oA4/view?usp=sharing](https://drive.google.com/file/d/1u64R1oHIU8W7Xiz_qTXvjBffkLAB0oA4/view?usp=sharing)
 2. Extract the folder `seeyourdata-local-linux-x64`
 3. Execute the file `seeyourdata-local` to launch the app, you can click on the file or run `./seeyourdata-local` in the command line
 
 ### Windows (x64)
 
-1. Download the packaged app at [https://drive.google.com/file/d/1lpZ_4Kq-612oWcpGLjOdpyqIJJq0ObAo/view?usp=sharing](https://drive.google.com/file/d/1lpZ_4Kq-612oWcpGLjOdpyqIJJq0ObAo/view?usp=sharing)
+1. Download the packaged app at [https://drive.google.com/file/d/1meCWJCg3UF_0uUjlWeetvbx0yDEWfdwB/view?usp=sharing](https://drive.google.com/file/d/1meCWJCg3UF_0uUjlWeetvbx0yDEWfdwB/view?usp=sharing)
 2. Extract the folder `seeyourdata-local-win32-x64`
 3. (this step is to prevent a Windows error from preventing an unrecognised app from starting, if step 4 works, you may skip this step) Right click on `seeyourdata-local.exe`, select 'Properties', check 'Unblock' next to the security field 
 4. Execute the file `seeyourdata-local.exe` to launch the app, you can click on the file or run `start seeyourdata-local.exe` in the command line

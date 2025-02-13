@@ -17,6 +17,7 @@ const Activity = ({ db, isHome }) => {
     isHome ? 
       (db.activity ?
         <div className='explore-more-container' onClick={ () => navigate('/activity') }>
+          <div className='blocker'></div>
           <div className='explore-more-bar'>
             <button className='explore-more-indicator'>Explore More <FaLongArrowAltRight/></button>
           </div>

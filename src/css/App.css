@@ -1,11 +1,14 @@
 button {
     border: solid black 2px;
     width: fit-content;
+    border-radius: 1rem;
+    margin: 0.2rem;
+    padding: 0.3rem 0.5rem;
   }
   
 button:hover {
   color: white;
-  background: rgb(67, 67, 67);
+  background: rgb(97, 97, 97);
 }
 
 button.highlighted {
@@ -24,7 +27,7 @@ button.highlighted {
 .card-container {
   position: fixed;
   z-index: 9999;
-  background: #b3ebf2;
+  background: #d6ceaa;
   overflow-x: hidden;
   overflow-y: scroll;
   overscroll-behavior: contain;
@@ -62,4 +65,13 @@ button.highlighted {
 .info-button h4 {
   margin: 0;
 }
+
+img {
+  width: 50%;
+}
+
+.sample-tile {
+  width: 20%;
+}
+
   

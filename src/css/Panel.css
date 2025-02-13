@@ -23,6 +23,7 @@ td {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    min-height: 70vh;
 }
 
 .chat-container {
@@ -34,8 +35,8 @@ td {
 
 .ai-chat {
     margin-right: 20%;
-    border-color: blue;
-    color: blue;
+    border-color:#126ac2;
+    color:#126ac2;
 }
 
 .flashing {

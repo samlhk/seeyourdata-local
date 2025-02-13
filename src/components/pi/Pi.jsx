@@ -11,6 +11,7 @@ const Pi = ({ db, isHome }) => {
     isHome ?
       (db.piPhone || db.piLocation || db.piIp || db.piDevice ?
         <div className='explore-more-container' onClick={ () => navigate('/pi') }>
+          <div className='blocker'></div>
           <div className='explore-more-bar'>
             <button className='explore-more-indicator'>Explore More <FaLongArrowAltRight/></button>
           </div>
