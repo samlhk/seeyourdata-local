@@ -21,6 +21,14 @@ There are 2 ways to run the app
 3. (this step is to prevent a Windows error from preventing an unrecognised app from starting, if step 4 works, you may skip this step) Right click on `seeyourdata-local.exe`, select 'Properties', check 'Unblock' next to the security field 
 4. Execute the file `seeyourdata-local.exe` to launch the app, you can click on the file or run `start seeyourdata-local.exe` in the command line
 
+### MacOS
+
+1. Download the packaged app at 
+- x64: [https://mega.nz/file/biwklIRK#TC6N4D3VNZcYGU-8-xBUf4AlP5g4qVEm7-OydqVV6TQ](https://mega.nz/file/biwklIRK#TC6N4D3VNZcYGU-8-xBUf4AlP5g4qVEm7-OydqVV6TQ)
+- arm: [https://mega.nz/file/nmAWlJ6S#9c6dzjvmvMCGi0yoo6AY2WKewWI9e8HZcr8rNnwO-qU](https://mega.nz/file/nmAWlJ6S#9c6dzjvmvMCGi0yoo6AY2WKewWI9e8HZcr8rNnwO-qU)
+2. Extract the folder `seeyourdata-local-darwin-<x64/arm>`
+3. Execute the file `seeyourdata-local.app` to launch the app, you can click on the file
+
 ## 2. Run the node app directly
 
 ### Developer mode (recommended)
