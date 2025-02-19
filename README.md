@@ -27,7 +27,8 @@ There are 2 ways to run the app
 - x64: [https://mega.nz/file/biwklIRK#TC6N4D3VNZcYGU-8-xBUf4AlP5g4qVEm7-OydqVV6TQ](https://mega.nz/file/biwklIRK#TC6N4D3VNZcYGU-8-xBUf4AlP5g4qVEm7-OydqVV6TQ)
 - arm: [https://mega.nz/file/nmAWlJ6S#9c6dzjvmvMCGi0yoo6AY2WKewWI9e8HZcr8rNnwO-qU](https://mega.nz/file/nmAWlJ6S#9c6dzjvmvMCGi0yoo6AY2WKewWI9e8HZcr8rNnwO-qU)
 2. Extract the folder `seeyourdata-local-darwin-<x64/arm>`
-3. Execute the file `seeyourdata-local.app` to launch the app, you can click on the file
+3. Run `xattr -cr /path/to/seeyourdata-local.app` in the terminal
+4. Launch the app by double clicking on `seeyourdata-local.app`
 
 ## 2. Run the node app directly
 
