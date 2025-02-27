@@ -53,10 +53,6 @@ const Dialogue = ({ db, isHome }) => {
     setChatId(null);
   }
 
-  const populatePrompt = (prompt) => {
-    setPrompt(prompt);
-  }
-
   return (
     db && Object.keys(db).length > 0 ?
       <div className='dialogue-container'>
@@ -69,7 +65,7 @@ const Dialogue = ({ db, isHome }) => {
                   <div>
                     The local AI LLM chatbot is trained on your data and can answer your questions on things about your data <br/>
                     It may take some time to generate an answer depending on your device, you may find closing other programs makes the AI run faster<br/>
-                    It may fail to generate a answer or if the answer does not make sense, you can re-open the app and try again.<br/>
+                    It may fail to generate an answer or if the answer does not make sense, you can re-open the app and try again.<br/>
                     It is important to note the answers are generated with AI and may not be accurate, care should be taken when processing the information generated<br/>
                     Due to the small size of the local LLM, there are limitations in the level of inference it can produce and you may have to probe more times to get answers you want
                   </div>

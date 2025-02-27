@@ -21,7 +21,7 @@ There are 2 ways to run the app
 3. (this step is to prevent a Windows error from preventing an unrecognised app from starting, if step 4 works, you may skip this step) Right click on `seeyourdata-local.exe`, select 'Properties', check 'Unblock' next to the security field 
 4. Execute the file `seeyourdata-local.exe` to launch the app, you can click on the file or run `start seeyourdata-local.exe` in the command line
 
-### MacOS
+### MacOS (only supports Instagram data)
 
 1. Download the packaged app at 
 - x64: [https://mega.nz/file/biwklIRK#TC6N4D3VNZcYGU-8-xBUf4AlP5g4qVEm7-OydqVV6TQ](https://mega.nz/file/biwklIRK#TC6N4D3VNZcYGU-8-xBUf4AlP5g4qVEm7-OydqVV6TQ)

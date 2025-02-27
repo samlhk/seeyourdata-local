@@ -457,8 +457,8 @@ const Home = () => {
 
         const activityApps = ['Ads', 'Chrome', 'Developers', 'Drive', 'Flights', 'Help', 'Hotels', 'Image Search', 'Search', 'Shopping', 'Takeout'];
         for await (const app of activityApps) {
-          let file = zip.file(`Takeout/My Activity/${app}/My Activity.html`) || 
-            zip.file(innerZipFolder + `Takeout/My Activity/${app}/My Activity.html`);
+          let file = zip.file(`Takeout/My Activity/${app}/My Activity.html`) || zip.file(`Takeout/My Activity/${app}/MyActivity.html`) ||
+            zip.file(innerZipFolder + `Takeout/My Activity/${app}/My Activity.html`) || zip.file(innerZipFolder + `Takeout/My Activity/${app}/MyActivity.html`);
           if (file) {
             console.log(`Processing google ${app}`);
             const data = await file.async('text');
@@ -485,8 +485,8 @@ const Home = () => {
           }
         }
 
-        let googlePlayStoreFile = zip.file('Takeout/My Activity/Google Play Store/My Activity.html') || 
-          zip.file(innerZipFolder + 'Takeout/My Activity/Google Play Store/My Activity.html');
+        let googlePlayStoreFile = zip.file('Takeout/My Activity/Google Play Store/My Activity.html') || zip.file('Takeout/My Activity/Google Play Store/MyActivity.html') || 
+          zip.file(innerZipFolder + 'Takeout/My Activity/Google Play Store/My Activity.html') || zip.file(innerZipFolder + 'Takeout/My Activity/Google Play Store/MyActivity.html') ;
         if (googlePlayStoreFile) {
           console.log('Processing google play store');
           const data = await googlePlayStoreFile.async('text');
@@ -502,8 +502,8 @@ const Home = () => {
           })
         }
         
-        let googleMapsFile = zip.file('Takeout/My Activity/Maps/My Activity.html') || 
-          zip.file(innerZipFolder + 'Takeout/My Activity/Maps/My Activity.html');
+        let googleMapsFile = zip.file('Takeout/My Activity/Maps/My Activity.html') || zip.file('Takeout/My Activity/Maps/MyActivity.html') || 
+          zip.file(innerZipFolder + 'Takeout/My Activity/Maps/My Activity.html') || zip.file(innerZipFolder + 'Takeout/My Activity/Maps/MyActivity.html');
         if (googleMapsFile) {
           console.log('Processing google maps');
           const data = await googleMapsFile.async('text');
@@ -527,8 +527,8 @@ const Home = () => {
           addLocations(locations);
         }
         
-        let googleYoutubeFile = zip.file(`Takeout/My Activity/YouTube/My Activity.html`) || 
-            zip.file(innerZipFolder + `Takeout/My Activity/YouTube/My Activity.html`);
+        let googleYoutubeFile = zip.file(`Takeout/My Activity/YouTube/My Activity.html`) || zip.file(`Takeout/My Activity/YouTube/MyActivity.html`) || 
+            zip.file(innerZipFolder + `Takeout/My Activity/YouTube/My Activity.html`) || zip.file(innerZipFolder + `Takeout/My Activity/YouTube/MyActivity.html`);
           if (googleYoutubeFile) {
             console.log(`Processing Youtube`);
             const data = await googleYoutubeFile.async('text');
@@ -636,9 +636,9 @@ const Home = () => {
               See below for instructions and supported platforms: <br/>
               <button onClick={() => {setInstructionCard(instructionCard === 'google' ? '' : 'google')}} className={instructionCard === 'google' ? 'highlighted' : ''}>Google</button>&nbsp;
               <button onClick={() => {setInstructionCard(instructionCard === 'instagram' ? '' : 'instagram')}} className={instructionCard === 'instagram' ? 'highlighted' : ''}>Instagram</button>&nbsp;
+              <button onClick={() => {setInstructionCard(instructionCard === 'linkedin' ? '' : 'linkedin')}} className={instructionCard === 'linkedin' ? 'highlighted' : ''}>LinkedIn</button>&nbsp;
               <button disabled onClick={() => {setInstructionCard(instructionCard === 'facebook' ? '' : 'facebook')}} className={instructionCard === 'facebook' ? 'highlighted' : ''}>Facebook (coming soon)</button>&nbsp;
               <button disabled onClick={() => {setInstructionCard(instructionCard === 'x' ? '' : 'x')}} className={instructionCard === 'x' ? 'highlighted' : ''}>X (Twitter) (coming soon)</button>&nbsp;
-              <button disabled onClick={() => {setInstructionCard(instructionCard === 'linkedin' ? '' : 'linkedin')}} className={instructionCard === 'linkedin' ? 'highlighted' : ''}>LinkedIn (coming soon)</button>&nbsp;
               {
                 instructionCard === 'google' &&
                 <Card toggleCard={() => {setInstructionCard('')}} title='Download your data from Google' content=
@@ -646,10 +646,10 @@ const Home = () => {
                   <ol>
                     <li>Go to <a href='https://takeout.google.com/' target='_blank'>Google Takeout (https://takeout.google.com/)</a> while logged in to your Google account</li>
 
-                    <li>Select data you want to download (select all for a comprehensive review), then deselect <i>Drive</i> to reduce download size<br/><img src={require('../img/google1.png')} /></li>
-                    <li>Click <i>Next Step</i><br/><img src={require('../img/google2.png')} /></li>
-                    <li>Select <i>Transfer to: Send download link via email</i> and <i>Frequency: Export once</i><br/><img src={require('../img/google3.png')} /></li>
-                    <li>Select <i>File type: .zip</i>, <i>File size: 1 GB</i> and click <i>Create export</i><br/><img src={require('../img/google4.png')} /></li>
+                    <li>Select data you want to download (please select all if possible for a comprehensive review), then deselect <strong>Drive</strong> to reduce download size<br/><img src={require('../img/google1.png')} /></li>
+                    <li>Click <strong>Next Step</strong><br/><img src={require('../img/google2.png')} /></li>
+                    <li>Select <strong>Transfer to: Send download link via email</strong> and <strong>Frequency: Export once</strong><br/><img src={require('../img/google3.png')} /></li>
+                    <li>Select <strong>File type: .zip</strong>, <strong>File size: 1 GB</strong> and click <strong>Create export</strong><br/><img src={require('../img/google4.png')} /></li>
                     <li>Your request has been sent and it might take a couple of hours or days<br/><img src={require('../img/google5.png')} /></li>
                     <li>Download your data when you have received this email from Google, your data downloads should be (multiple) files in the form of <strong>takeout-xxxx-xxx.zip</strong><br/><img src={require('../img/google6.png')} /></li>
                   </ol>
@@ -662,14 +662,29 @@ const Home = () => {
                   <ol>
                     <li>Follow the instructions on <a href='https://help.instagram.com/181231772500920' target='_blank'>https://help.instagram.com/181231772500920</a>, these steps are written with reference to it</li>
                     <li>Go to <a href='https://accountscenter.instagram.com/info_and_permissions/' target='_blank'>https://accountscenter.instagram.com/info_and_permissions/</a> while logged in to your Instagram/Meta account</li>
-                    <li>Click <i>Download your information</i><br/><img src={require('../img/instagram1.png')} /></li>
-                    <li>Click <i>Download or transfer information</i><br/><img src={require('../img/instagram2.png')} /></li>
+                    <li>Click <strong>Download your information</strong><br/><img src={require('../img/instagram1.png')} /></li>
+                    <li>Click <strong>Download or transfer information</strong><br/><img src={require('../img/instagram2.png')} /></li>
                     <li>Select your Instagram account<br/><img src={require('../img/instagram3.png')} /></li>
-                    <li>Click <i>All available information</i><br/><img src={require('../img/instagram4.png')} /></li>
-                    <li>Click <i>Download to device</i><br/><img src={require('../img/instagram5.png')} /></li>
-                    <li>Select <i>Format: JSON</i> and the <i>Date range</i> and <i>Media quality</i> you desire<br/><img src={require('../img/instagram6.png')} /></li>
+                    <li>Click <strong>All available information</strong><br/><img src={require('../img/instagram4.png')} /></li>
+                    <li>Click <strong>Download to device</strong><br/><img src={require('../img/instagram5.png')} /></li>
+                    <li>Select <strong>Format: JSON</strong> and the <strong>Date range</strong> and <strong>Media quality</strong> you desire<br/><img src={require('../img/instagram6.png')} /></li>
                     <li>Your request has been sent and it might take a couple of hours or days<br/><img src={require('../img/instagram7.png')} /></li>
                     <li>Download your data when you have received this email from Instagram, your data downloads should be files in the form of <strong>instagram-xxxx-xxx.zip</strong><br/><img src={require('../img/instagram8.png')} /></li>
+                </ol>
+                }/>
+              }
+              {
+                instructionCard === 'linkedin' &&
+                <Card toggleCard={() => {setInstructionCard('')}} title='Download your data from LinkedIn' content=
+                {
+                  <ol>
+                    <li>Follow the instructions on <a href='https://www.linkedin.com/help/linkedin/answer/a1339364/downloading-your-account-data' target='_blank'>https://www.linkedin.com/help/linkedin/answer/a1339364/downloading-your-account-data</a>, these steps are written with reference to it</li>
+                    <li>Go to your LinkedIn homepage: <a href='https://www.linkedin.com/feed/' target='_blank'>https://www.linkedin.com/feed/</a></li>
+                    <li>Click <strong>Me</strong> below your profile picture and select <strong>Settings and Privacy</strong> from the dropdown<br/><img src={require('../img/linkedin1.png')}/></li>
+                    <li>Select <strong>Data Privacy</strong> and click <strong>Get a copy of your data</strong><br/><img src={require('../img/linkedin2.png')}/></li>
+                    <li>Select the data you want to include and click <strong>Request archive</strong><br/><img src={require('../img/linkedin3.png')}/></li>
+                    <li>Your request has been sent and it might take a couple of hours or days<br/><img src={require('../img/linkedin4.png')}/></li>
+                    <li>Download your data when you have received the corresponding email from LinkedIn</li>
                 </ol>
                 }/>
               }
@@ -734,8 +749,8 @@ const Home = () => {
             </div>
           </div>
 
-          <Activity db={ db } isHome={ true }/>
           <Dialogue db={ db } isHome={ true }/>
+          <Activity db={ db } isHome={ true }/>
           <Location db={ db } isHome={ true }/>
           <Interests db={ db } isHome={ true }/>
           <Pi db={ db } isHome={ true }/>
