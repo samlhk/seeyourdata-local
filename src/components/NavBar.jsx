@@ -16,10 +16,12 @@ const NavBar = ({ db, highlighted }) => {
         <div className={(highlighted === 'interests' ? 'highlighted-nav' : '') + ' nav-item'} onClick={() => navigate('/interests')}>Interests</div></>}
       {(db && (db.piPhone || db.piLocation || db.piIp || db.piDevice)) &&<><div>|</div>
         <div className={(highlighted === 'pi' ? 'highlighted-nav' : '') + ' nav-item'} onClick={() => navigate('/pi')}>Personal Information</div></>}
-      {((db && ((db.activity && db.activity.find(({app}) => app.includes('instagram'))) || db.instagramCommentedAccounts || db.instagramViewedAccounts || db.instagramLikedAccounts || db.instagramStoryInteractedAccounts))) &&<><div>|</div>
-        <div className={(highlighted === 'instagram' ? 'highlighted-nav' : '') + ' nav-item'} onClick={() => navigate('/instagram')}>Instagram</div></>}
       {((db && ((db.activity && db.activity.find(({app}) => app.includes('google'))) || db.sites || db.youtubeWatchedChannels || db.youtubeWatchedTopics))) &&<><div>|</div>
         <div className={(highlighted === 'google' ? 'highlighted-nav' : '') + ' nav-item'} onClick={() => navigate('/google')}>Google</div></>}
+      {((db && ((db.activity && db.activity.find(({app}) => app.includes('instagram'))) || db.instagramCommentedAccounts || db.instagramViewedAccounts || db.instagramLikedAccounts || db.instagramStoryInteractedAccounts))) &&<><div>|</div>
+        <div className={(highlighted === 'instagram' ? 'highlighted-nav' : '') + ' nav-item'} onClick={() => navigate('/instagram')}>Instagram</div></>}
+      {(db && db.activity && db.activity.find(({app}) => app.includes('linkedin'))) &&<><div>|</div>
+        <div className={(highlighted === 'linkedin' ? 'highlighted-nav' : '') + ' nav-item'} onClick={() => navigate('/linkedin')}>LinkedIn</div></>}
     </navbar>
   )
 }

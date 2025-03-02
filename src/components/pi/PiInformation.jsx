@@ -5,8 +5,8 @@ const PiInformation = ({ db }) => {
 
   const [pis, setPis] = useState();
 
-  const types = ['Phone', 'Location']; //, 'Ip', 'Device'];
-  const displayNames = ['Phone numbers', 'Locations']; // 'IP addresses', 'Devices'];
+  const types = ['Phone', 'Location', 'Zipcode']; //, 'Ip', 'Device'];
+  const displayNames = ['Phone numbers', 'Locations', 'Zip codes']; // 'IP addresses', 'Devices'];
 
   useEffect(() => {
     render();
@@ -35,7 +35,10 @@ const PiInformation = ({ db }) => {
         title='Personal Information'
         benefits='Platforms may store your personal information for record purposes, or you may have provided this when you signed up'
         harms='Misuse or leaks of personal information may pose privacy risks'
-        sources={['Instagram personal information and login activity']}
+        sources={[
+          'Instagram personal information and login activity',
+          'Facebook primary and public locations'
+        ]}
       />
       <table>
         {

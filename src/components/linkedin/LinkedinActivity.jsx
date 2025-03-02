@@ -4,15 +4,15 @@ import { Line } from "react-chartjs-2";
 import InfoCard from '../InfoCard';
 
 
-const ActivityTrend = ({ db, colors, filterBar = true }) => {
+const LinkedinActivity = ({ db, colors, filterBar = true }) => {
 
   const [timeRange, setTimeRange] = useState(null);
   const [monthlyActivities, setMonthlyActivities] = useState(null);
-  const [filteredApps, setFilteredApps] = useState(new Set());
+  const [filteredActivities, setFilteredActivities] = useState(new Set());
   
   useEffect(() => {
     render();
-  }, [db, filteredApps])
+  }, [db, filteredActivities])
 
   const render = async () => {
     if (db && db.activity) {
@@ -20,8 +20,8 @@ const ActivityTrend = ({ db, colors, filterBar = true }) => {
       let earliest = new Date();
       db.activity.sort((item1, item2) => item2.timestamps.length - item1.timestamps.length);
       let activities = db.activity;
-      activities = activities.filter(({app}) => !app.includes('instagram: ') && !app.includes('google: ') && !app.includes('linkedin: '));
-      if (filteredApps.size > 0) activities = activities.filter(({app}) => filteredApps.has(app));
+      activities = activities.filter(({app}) => app.includes('linkedin: '));
+      if (filteredActivities.size > 0) activities = activities.filter(({app}) => filteredActivities.has(app.replace('linkedin: ', '')));
       activities = activities.slice(0, top);
       activities = activities.map(({app, timestamps}) => {
         const record = {};
@@ -35,7 +35,7 @@ const ActivityTrend = ({ db, colors, filterBar = true }) => {
             record[monthYear] = 1;
           }
         }
-        return { app, record };
+        return { app: app.replace('linkedin: ', ''), record };
       })
       const months = [];
       activities = activities.map(({app, record}, index) => {
@@ -67,25 +67,22 @@ const ActivityTrend = ({ db, colors, filterBar = true }) => {
     monthlyActivities && timeRange ?
     <div>
       <InfoCard 
-        title='Activity'
-        description='Your monthly activity for various apps, you may select up to 7 apps to compare their activity, the selection defaults to the top 7 apps you have used'
-        benefits='Platforms may collect this information to understand how you use them or for diagnostics, this data is generally stored in the form of time stamps of your access times'
-        sources={[
-          'Off Meta activities from Instagram/Facebook: which include timestamps representing "a summary of activity that businesses and organisations share with Meta about your interactions with them, such as visiting their apps or websites", read more here at https://www.facebook.com/help/2207256696182627',
-          'App activity through Google Play Store'
-        ]}
+        title='LinkedIn Activity'
+        description='Your monthly activity for various LinkedIn activities, you may select up to 7 activities to compare them, the selection defaults to the top 7 activities you have done'
+        benefits='LinkedIn stores your activity with timestamps attached, this can help you understand what you have done on the platform and when'
+        sources={['LinkedIn activity']}
       />
 
       {filterBar && <div className='filter-bar'>
-        <div>View apps</div>
-        <select id='app-filter' defaultValue='all' disabled={filteredApps.size === 7}
-          onChange={(e) => {setFilteredApps(filteredApps.union(new Set([e.target.value])))}}>
-          <option disabled={true} defaultValue={true} value='all'>All apps</option>
-          { db.activity.filter(({app}) => !app.includes('instagram: ') && !app.includes('google: ') && !app.includes('linkedin: ')).sort((a, b) => a.app.toLowerCase().localeCompare(b.app.toLowerCase())).map(({app}) => <option value={app}>{app}</option>) }
+        <div>View activities</div>
+        <select id='activity-filter' defaultValue='all' disabled={filteredActivities.size === 7}
+          onChange={(e) => {setFilteredActivities(filteredActivities.union(new Set([e.target.value])))}}>
+          <option disabled={true} defaultValue={true} value='all'>All activities</option>
+          { db.activity.filter(({app}) => app.includes('linkedin: ')).map(activity => ({...activity, app: activity.app.replace('linkedin: ', '')})).sort((a, b) => a.app.toLowerCase().localeCompare(b.app.toLowerCase())).map(({app}) => <option value={app}>{app}</option>) }
         </select>
-        <button disabled={filteredApps.size === 0} onClick={() => {
-          setFilteredApps(new Set());
-          document.getElementById('app-filter').value = 'all';
+        <button disabled={filteredActivities.size === 0} onClick={() => {
+          setFilteredActivities(new Set());
+          document.getElementById('activity-filter').value = 'all';
         }}>Clear Filter</button>
       </div>}
 
@@ -94,4 +91,4 @@ const ActivityTrend = ({ db, colors, filterBar = true }) => {
   )
 }
 
-export default ActivityTrend
+export default LinkedinActivity

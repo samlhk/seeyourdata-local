@@ -57,7 +57,7 @@ const ActivityTimes = ({ db, filterBar = true }) => {
         benefits='Platforms may collect this information to understand how you use them or for diagnostics, this data is generally stored in the form of time stamps of your access times'
         harms='Platforms may use this data to target advertisments at you at certain times'
         sources={[
-          'Off Meta activities from Instagram: which include timestamps representing "a summary of activity that businesses and organisations share with Meta about your interactions with them, such as visiting their apps or websites", read more here at https://www.facebook.com/help/2207256696182627',
+          'Off Meta activities from Instagram/Facebook: which include timestamps representing "a summary of activity that businesses and organisations share with Meta about your interactions with them, such as visiting their apps or websites", read more here at https://www.facebook.com/help/2207256696182627',
           'App activity through Google Play Store'
         ]}
       />

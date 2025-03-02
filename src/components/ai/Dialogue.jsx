@@ -91,6 +91,8 @@ const Dialogue = ({ db, isHome }) => {
                   <h6>Google</h6>
                   <Prompter prompt='How do I use different Google services, including YouTube?' setPrompt={setPrompt}/>
                   <Prompter prompt='What kind of things do I browse on the Internet and different online platforms?' setPrompt={setPrompt}/><br/>
+                  <h6>LinkedIn</h6>
+                  <Prompter prompt='What would be a good job suitable for me?' setPrompt={setPrompt}/>
               </>
             }
           />

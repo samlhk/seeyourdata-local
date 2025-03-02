@@ -18,6 +18,17 @@ td {
     border: solid 1px black;
 }
 
+/* Linkedin */
+
+.linkedin-container {
+    max-height: 50vh;
+}
+
+.profile-container {
+    display: flex;
+    flex-direction: column;
+}
+
 /* Dialogue */
 .dialogue-container {
     display: flex;

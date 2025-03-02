@@ -39,15 +39,22 @@ const Interests = ({ db, isHome }) => {
         />
         <InterestsWordCloudRefresh db = { db } type='advertisers' title='Your advertisers'
           description='Advertisers using your activity or information, refresh to see more advertisers'
-          sources={['Instagram advertisers']}
+          sources={['Instagram advertisers', 'Facebook advertisers']}
         />
         <InterestsWordCloudRefresh db = { db } type='recommendedTopics' title='Topics for content recommendations' 
           description='Your topics, determined by online platforms, refresh to see more topics'
-          sources={['Instagram topics: "A collection of topics determined by your activity on Instagram that is used to create recommendations for you in different areas of Instagram, such as Reels, feed recommendations, and Shopping"']}
+          sources={[
+            'Instagram topics: "A collection of topics determined by your activity on Instagram that is used to create recommendations for you in different areas of Instagram, such as Reels, feed recommendations, and Shopping"',
+            'Facebook topics: "Your interests based on your Facebook activity and other actions that help us show you relevant ads"',
+            'Facebook locations of interest: "Locations of interest are used to personalise your experience on Facebook and show you more relevant ads. Learn more about how Facebook uses location in Privacy Centre"'
+          ]}
         />
         <InterestsWordCloud db = { db } type='searchedTopics' title='Topics you have searched for'
           description='Topics from your searches through the online platforms, generated with LDA topic modelling'
-          sources={['Searches on Google products: YouTube, Chrome, Flights, Hotels, Image Search, Search, Shopping']}
+          sources={[
+            'Searches on Google products: YouTube, Chrome, Flights, Hotels, Image Search, Search, Shopping',
+            'Facebook recent searches'
+          ]}
         />
         <InterestsWordCloud db = { db } type='viewedTopics' title='Topics you have viewed' 
           description={'Topics from things you have viewed through online platforms, generated with LDA topic modelling'}

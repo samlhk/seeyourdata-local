@@ -73,7 +73,6 @@ const InstagramMessageHeatMap = ({ db, filterBar = true }) => {
           <h5>{year}</h5>
           <HeatMap
             value={ value }
-            // TODO make responsive
             width={ 900 }
             legendCellSize={ 0 }
             rectSize={ 13 }

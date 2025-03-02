@@ -7,6 +7,7 @@ import Instagram from '../components/instagram/Instagram';
 import Pi from '../components/pi/Pi';
 import Google from '../components/google/Google';
 import NavBar from '../components/NavBar';
+import Linkedin from '../components/linkedin/Linkedin';
 
 const Page = ({ category }) => {
 
@@ -30,8 +31,9 @@ const Page = ({ category }) => {
           {category === 'location' && <Location db={ db }/> }
           {category === 'interests' && <Interests db={ db }/> }
           {category === 'pi' && <Pi db={ db }/> }
-          {category === 'instagram' && <Instagram db={ db }/> }
           {category === 'google' && <Google db={ db }/> }
+          {category === 'instagram' && <Instagram db={ db }/> }
+          {category === 'linkedin' && <Linkedin db={ db }/> }
         </div>
       </div>
     </div>

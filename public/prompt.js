@@ -103,6 +103,12 @@ const jsonToMd = (json) => {
     })
   }
 
+  if (json.piZipcode) {
+    json.piZipcode.forEach(({source, list}) => {
+      md.push(`the user has used ${source} from these zip codes: ${list}`);
+    })
+  }
+
   // if (json.piIp) {
   //   json.piIp.forEach(({source, list}) => {
   //     md.push(`the user has used ${source} from these IP addresses: ${list}`);
@@ -159,6 +165,24 @@ const jsonToMd = (json) => {
 
   if (json.youtubeWatchedTopics) { 
     md.push(`the user has watched video content related the following topics on YouTube: ${json.youtubeWatchedTopics.map(({topic}) => topic)}`);
+  }
+
+  if (json.connectedCompanies) {
+    md.push(`the user has connected with people from these companies on LinkedIn: ${[...new Set(json.connectedCompanies)]}`);
+  }
+
+  if (json.connectedPositions) {
+    md.push(`the user has connected with people in these roles on LinkedIn: ${[...new Set(json.connectedPositions)]}`);
+  }
+
+  // if (json.connections) { 
+  //   md.push(`the user has connected with these people on LinkedIn: ${json.connections.map(({name}) => name)}`);
+  // }
+
+  if (json.linkedinProfile) {
+    json.linkedinProfile.forEach(({field, values}) => {
+      md.push(`LinkedIn has inferred that the user's ${field} is: ${values}`);
+    })
   }
 
   return md.join('\n');

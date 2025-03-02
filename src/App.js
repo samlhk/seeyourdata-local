@@ -59,8 +59,9 @@ function App() {
           <Route path='/interests' element={ <Page category='interests'/> }/>
           <Route path='/location' element={ <Page category='location'/> }/>
           <Route path='/pi' element={ <Page category='pi'/> }/>
-          <Route path='/instagram' element={ <Page category='instagram'/> }/>
           <Route path='/google' element={ <Page category='google'/> }/>
+          <Route path='/instagram' element={ <Page category='instagram'/> }/>
+          <Route path='/linkedin' element={ <Page category='linkedin'/> }/>
       </Routes>
     </Router>
   );

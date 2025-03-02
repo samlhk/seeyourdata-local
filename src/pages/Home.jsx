@@ -12,6 +12,8 @@ import Card from '../components/Card';
 import Google from '../components/google/Google';
 import InfoCard from '../components/InfoCard';
 import NavBar from '../components/NavBar';
+import Papa from 'papaparse';
+import Linkedin from '../components/linkedin/Linkedin';
 const { parse } = require('node-html-parser');
 const lda = require('lda');
 const Sentiment = require('sentiment');
@@ -134,7 +136,7 @@ const Home = () => {
         source = encodeUnicode(source);
         list = encodeUnicodes(list);
         if (!db[type]) db[type] = [];
-        if (!db[type].find(item => item.soruce === source)) db[type] = db[type] = db[type].concat([{source, list: []}]);
+        if (!db[type].find(item => item.source === source)) db[type] = db[type] = db[type].concat([{source, list: []}]);
         const set = new Set(db[type].find(item => item.source === source).list).union(new Set(list));
         db[type].find(item => item.source === source).list = Array.from(set);
       }
@@ -144,7 +146,7 @@ const Home = () => {
       const addPi = (type, source, list) => {
         const piType = 'pi' + type;
         if (!db[piType]) db[piType] = [];
-        if (!db[piType].find(item => item.soruce === source)) db[piType] = db[piType] = db[piType].concat([{source, list: []}]);
+        if (!db[piType].find(item => item.source === source)) db[piType] = db[piType] = db[piType].concat([{source, list: []}]);
         const set = new Set(db[piType].find(item => item.source === source).list).union(new Set(list));
         db[piType].find(item => item.source === source).list = Array.from(set);
       }
@@ -162,6 +164,12 @@ const Home = () => {
       const addGoogle = (category, list) => {
         list = encodeUnicodes(list);
         if (!new Set(list).isSubsetOf(new Set(db[category] || []))) db[category] = (db[category] || []).concat(list);
+      }
+
+      // LinkedIn
+
+      const addLinkedin = (category, list) => {
+        db[category] = list;
       }
 
       try {
@@ -445,6 +453,124 @@ const Home = () => {
         }
 
         // ---------------------------------
+        // ------------Facebook-------------
+        // ---------------------------------
+
+        // Facebook utilities
+
+        const label_values_ok = (label_values) => {
+          return label_values && label_values.length > 0 && label_values[0].vec?.length > 0;
+        }
+
+        let facebookAdvertisersFile = zip.file('ads_information/advertisers_using_your_activity_or_information.json') ||
+          zip.file(innerZipFolder + 'ads_information/advertisers_using_your_activity_or_information.json');
+        if (facebookAdvertisersFile) {
+          console.log('Processing facebook advertisers');
+          const data = await facebookAdvertisersFile.async('text');
+          const json = JSON.parse(data);
+          if (label_values_ok(json.label_values)) {
+            const advertisers = json.label_values[0].vec.map(({value}) => value);
+            console.log(advertisers);
+            addTopics('advertisers', 'facebook', advertisers);
+          }
+        }
+
+        let facebookOffMetaActivityFile = zip.file('apps_and_websites_off_of_facebook/your_activity_off_meta_technologies.json') ||
+          zip.file(innerZipFolder + 'apps_and_websites_off_of_instagram/apps_and_websites/your_activity_off_meta_technologies.json');
+        if (facebookOffMetaActivityFile) {
+          console.log(`Processing facebook off meta activity`);
+          const data = await facebookOffMetaActivityFile.async('text');
+          const json = JSON.parse(data);
+          json.forEach(({ title, label_values }) => {
+            if (label_values_ok(label_values)) {
+              const timestamps = label_values[0].vec.map(obj => new Date(obj.dict[obj.dict.length - 1].timestamp_value * 1000).toString());
+              addActivity(title, timestamps);
+            }
+          })
+        };
+
+        let facebookPrimaryLocationFile = zip.file('logged_information/location/primary_location.json') ||
+          zip.file(innerZipFolder + 'logged_information/location/primary_location.json');
+        if (facebookPrimaryLocationFile) {
+          console.log('Processing facebook primary location');
+          const data = await facebookPrimaryLocationFile.async('text');
+          const json = JSON.parse(data);
+          if (json.primary_location_v2?.city_region_pairs.length > 0) {
+            const locations = json.primary_location_v2.city_region_pairs.map(pair => pair.join(','));
+            addPi('Location', 'facebook', locations);
+          }
+          if (json.primary_location_v2?.zipcode.length > 0) {
+            addPi('Zipcode', 'facebook', json.primary_location_v2.zipcode);
+          }
+        }
+
+        let facebookPrimaryPublicLocationFile = zip.file('logged_information/location/primary_public_location.json') ||
+          zip.file(innerZipFolder + 'logged_information/location/primary_public_location.json');
+        if (facebookPrimaryPublicLocationFile) {
+          console.log('Processing facebook primary public location');
+          const data = await facebookPrimaryPublicLocationFile.async('text');
+          const json = JSON.parse(data);
+          if (json.primary_public_location_v2) {
+            const location = `${json.primary_public_location_v2.city}, ${json.primary_public_location_v2.region}, ${json.primary_public_location_v2.country}`;
+            addPi('Location', 'facebook', [location]);
+          }
+        }
+
+        let facebookLocationsOfInterestFile = zip.file('logged_information/other_logged_information/locations_of_interest.json') ||
+          zip.file(innerZipFolder + 'logged_information/other_logged_information/locations_of_interest.json');
+        if (facebookLocationsOfInterestFile) {
+          console.log('Processing facebook locations of interest');
+          const data = await facebookLocationsOfInterestFile.async('text');
+          const json = JSON.parse(data);
+          if (label_values_ok(json.label_values)) {
+            const locations = json.label_values[0].vec.map(({value}) => value);
+            addTopics('recommendedTopics', 'facebook locations of interest', locations);
+          }
+        }
+
+        let facebookAdsInterestsFile = zip.file('logged_information/other_logged_information/ads_interests.json') ||
+          zip.file(innerZipFolder + 'logged_information/other_logged_information/ads_interests.json');
+        if (facebookAdsInterestsFile) {
+          console.log('Processing facebook ads interests');
+          const data = await facebookAdsInterestsFile.async('text');
+          const json = JSON.parse(data);
+          addTopics('recommendedTopics', 'facebook', json.topics_v2);
+        }
+
+        let facebookSearchHistoryFile = zip.file('logged_information/search/your_search_history.json') ||
+          zip.file(innerZipFolder + 'logged_information/search/your_search_history.json');
+        if (facebookSearchHistoryFile) {
+          console.log('Processing facebook search history');
+          const data = await facebookSearchHistoryFile.async('text');
+          const json = JSON.parse(data);
+          if (json.searches_v2) {
+            const searches = [];
+            json.searches_v2.forEach(obj => {
+              if (obj.data && obj.data.length > 0 && obj.data[0].text) searches.push(obj.data[0].text);
+            })
+            if (searches.length > 0) addContent('searched', 'facebook', searches);
+          }
+        }
+
+        let facebookAccountActivityFile = zip.file('security_and_login_information/account_activity.json') ||
+          zip.file(innerZipFolder + 'security_and_login_information/account_activity.json');
+        if (facebookAccountActivityFile) {
+          console.log('Processing facebook account activity');
+          const data = await facebookAccountActivityFile.async('text');
+          const json = JSON.parse(data);
+          const timestamps = json.account_activity_v2.map(({timestamp}) => new Date(timestamp * 1000).toString());
+          addActivity('Facebook', timestamps);
+          const ips = json.account_activity_v2.map(({ip_address}) => ip_address);
+          const latlongs = await window.api.ipsToLatlong(ips);
+          const locations = latlongs.map((latlong, index) => ({
+              latlong,
+              label: 'IP: ' + ips[index],
+              source: 'Facebook log in'
+            }))
+          addLocations(locations);
+        }
+
+        // ---------------------------------
         // ------------Google---------------
         // ---------------------------------
 
@@ -538,7 +664,7 @@ const Home = () => {
             const searches = [];
             const watched = [];
             const watchedChannels = [];
-            for (const element of divElements) {
+            for (const element of divElements) { 
               const description = element.innerText.split('\n');
               if (element.innerText.match(/^Searched\sfor\s/)) searches.push(description[0].slice(13));
               else if (element.innerText.match(/^Watched\s/)) {
@@ -553,6 +679,115 @@ const Home = () => {
             if (watched.length > 0) addContent('youtubeWatched', 'YouTube', watched);
             if (watchedChannels.length > 0) addGoogle('youtubeWatchedChannels', watchedChannels);
           }
+        
+        // ---------------------------------
+        // ------------LinkedIn-------------
+        // ---------------------------------
+
+        // LinkedIn utilities
+
+        let linkedinAdsClickedFile = zip.file('Ads Clicked.csv') ||
+          zip.file(innerZipFolder + 'Ads Clicked.csv');
+        if (linkedinAdsClickedFile) {
+          console.log('Processing linkedin ads clicked');
+          const data = await linkedinAdsClickedFile.async('text');
+          const csv = Papa.parse(data);
+          const timestamps = csv.data.slice(1, -1).map(arr => new Date(arr[0]).toString());
+          addActivity('linkedin: click ads', timestamps);
+        }
+
+        let linkedinLoginsFile = zip.file('Logins.csv') ||
+          zip.file(innerZipFolder + 'Logins.csv');
+        if (linkedinLoginsFile) {
+          console.log('Processing linkedin logins');
+          const data = await linkedinLoginsFile.async('text');
+          const csv = Papa.parse(data);
+          const timestamps = csv.data.slice(1, -1).map(arr => new Date(arr[0]).toString());
+          addActivity('linkedin: log in', timestamps);
+          const ips = csv.data.slice(1, -1).map(arr => arr[1]);
+          const latlongs = await window.api.ipsToLatlong(ips);
+          const locations = latlongs.map((latlong, index) => ({
+              latlong,
+              label: 'IP: ' + ips[index],
+              source: 'LinkedIn log in'
+            }))
+          addLocations(locations);
+        }
+
+        let linkedinProfileFile = zip.file('Profile.csv') ||
+          zip.file(innerZipFolder + 'Profile.csv');
+        let linkedinMessagesFile = zip.file('messages.csv') ||
+        zip.file(innerZipFolder + 'messages.csv');
+        if (linkedinProfileFile && linkedinMessagesFile) {
+          console.log('Processing linkedin messages');
+          const profileData = await linkedinProfileFile.async('text');
+          const profileCsv = Papa.parse(profileData);
+          const you = profileCsv.data[1].slice(0, 3).join(' ');
+          const data = await linkedinMessagesFile.async('text');
+          const csv = Papa.parse(data);
+          const yourMessages = csv.data.slice(1, -1).filter(arr => you.includes(arr[2]));
+          const timestamps = yourMessages.map(arr => new Date(arr[6]).toString());
+          addActivity('linkedin: messages', timestamps);
+          const messages = yourMessages.map(arr => arr[8]);
+          addContent('messaged', 'linkedin messages', messages);
+        }
+
+        let linkedinReactionsFile = zip.file('Reactions.csv') ||
+          zip.file(innerZipFolder + 'Reactions.csv');
+        if (linkedinReactionsFile) {
+          console.log('Processing linkedin likes');
+          const data = await linkedinReactionsFile.async('text');
+          const csv = Papa.parse(data);
+          const timestamps = csv.data.slice(1, -1).filter(arr => arr[1] === 'LIKE').map(arr => new Date(arr[0]).toString());
+          addActivity('linkedin: likes', timestamps);
+        }
+
+        let linkedinSharesFile = zip.file('Shares.csv') ||
+          zip.file(innerZipFolder + 'Shares.csv');
+        if (linkedinSharesFile) {
+          console.log('Processing linkedin posts');
+          const data = await linkedinSharesFile.async('text');
+          const csv = Papa.parse(data);
+          const timestamps = csv.data.slice(1, -1).map(arr => new Date(arr[0]).toString());
+          addActivity('linkedin: posts', timestamps);
+          const content = csv.data.slice(1, -1).map(arr => arr[2]);
+          addContent('posted', 'linkedin posts', content);
+        }
+
+        let linkedinAdTargetingFile = zip.file('Ad_Targeting.csv') ||
+          zip.file(innerZipFolder + 'Ad_Targeting.csv');
+        if (linkedinAdTargetingFile) {
+          console.log('Processing linkedin ad targetting');
+          const data = await linkedinAdTargetingFile.async('text');
+          const csv = Papa.parse(data);
+          const profile = [];
+          for (let i = 0; i < csv.data[0].length; i++) {
+            if (!profile.find(({field}) => field === csv.data[0][i]) && csv.data[1][i].length > 0) {
+              profile.push({
+                field: csv.data[0][i],
+                values: csv.data[1][i].split(';')
+              })
+            }
+          }
+          addLinkedin('linkedinProfile', profile);
+        }
+
+        let linkedinConnectionsFile = zip.file('Connections.csv') ||
+          zip.file(innerZipFolder + 'Connections.csv');
+        if (linkedinConnectionsFile) {
+          console.log('Processing linkedin connections');
+          const data = await linkedinConnectionsFile.async('text');
+          const csv = Papa.parse(data);
+          const connections = csv.data.slice(4).map(arr => ({
+            timestamp: new Date(arr[6]).toString(),
+            name: arr[0] + ' ' + arr[1]
+          }));
+          addLinkedin('connections', connections);
+          const companies = csv.data.slice(4).map(arr => arr[4]);
+          addGoogle('connectedCompanies', companies);
+          const positions = csv.data.slice(4).map(arr => arr[5]);
+          addGoogle('connectedPositions', positions);
+        }
         
         // ---------------------------------
         // ------------Misc-----------------
@@ -636,16 +871,15 @@ const Home = () => {
               See below for instructions and supported platforms: <br/>
               <button onClick={() => {setInstructionCard(instructionCard === 'google' ? '' : 'google')}} className={instructionCard === 'google' ? 'highlighted' : ''}>Google</button>&nbsp;
               <button onClick={() => {setInstructionCard(instructionCard === 'instagram' ? '' : 'instagram')}} className={instructionCard === 'instagram' ? 'highlighted' : ''}>Instagram</button>&nbsp;
+              <button onClick={() => {setInstructionCard(instructionCard === 'facebook' ? '' : 'facebook')}} className={instructionCard === 'facebook' ? 'highlighted' : ''}>Facebook</button>&nbsp;
+              {/* <button onClick={() => {setInstructionCard(instructionCard === 'x' ? '' : 'x')}} className={instructionCard === 'x' ? 'highlighted' : ''}>X (Twitter)</button>&nbsp; */}
               <button onClick={() => {setInstructionCard(instructionCard === 'linkedin' ? '' : 'linkedin')}} className={instructionCard === 'linkedin' ? 'highlighted' : ''}>LinkedIn</button>&nbsp;
-              <button disabled onClick={() => {setInstructionCard(instructionCard === 'facebook' ? '' : 'facebook')}} className={instructionCard === 'facebook' ? 'highlighted' : ''}>Facebook (coming soon)</button>&nbsp;
-              <button disabled onClick={() => {setInstructionCard(instructionCard === 'x' ? '' : 'x')}} className={instructionCard === 'x' ? 'highlighted' : ''}>X (Twitter) (coming soon)</button>&nbsp;
               {
                 instructionCard === 'google' &&
                 <Card toggleCard={() => {setInstructionCard('')}} title='Download your data from Google' content=
                 {
                   <ol>
                     <li>Go to <a href='https://takeout.google.com/' target='_blank'>Google Takeout (https://takeout.google.com/)</a> while logged in to your Google account</li>
-
                     <li>Select data you want to download (please select all if possible for a comprehensive review), then deselect <strong>Drive</strong> to reduce download size<br/><img src={require('../img/google1.png')} /></li>
                     <li>Click <strong>Next Step</strong><br/><img src={require('../img/google2.png')} /></li>
                     <li>Select <strong>Transfer to: Send download link via email</strong> and <strong>Frequency: Export once</strong><br/><img src={require('../img/google3.png')} /></li>
@@ -660,7 +894,6 @@ const Home = () => {
                 <Card toggleCard={() => {setInstructionCard('')}} title='Download your data from Instagram' content=
                 {
                   <ol>
-                    <li>Follow the instructions on <a href='https://help.instagram.com/181231772500920' target='_blank'>https://help.instagram.com/181231772500920</a>, these steps are written with reference to it</li>
                     <li>Go to <a href='https://accountscenter.instagram.com/info_and_permissions/' target='_blank'>https://accountscenter.instagram.com/info_and_permissions/</a> while logged in to your Instagram/Meta account</li>
                     <li>Click <strong>Download your information</strong><br/><img src={require('../img/instagram1.png')} /></li>
                     <li>Click <strong>Download or transfer information</strong><br/><img src={require('../img/instagram2.png')} /></li>
@@ -674,17 +907,45 @@ const Home = () => {
                 }/>
               }
               {
+                instructionCard === 'facebook' &&
+                <Card toggleCard={() => {setInstructionCard('')}} title='Download your data from Facebook' content=
+                {
+                  <ol>
+                    <li>Go to <a href='https://accountscenter.facebook.com/info_and_permissions/' target='_blank'>https://accountscenter.facebook.com/info_and_permissions/</a> while logged in to your Facebook/Meta account</li>
+                    <li>Click <strong>Download your information</strong><br/><img src={require('../img/instagram1.png')} /></li>
+                    <li>Click <strong>Download or transfer information</strong><br/><img src={require('../img/instagram2.png')} /></li>
+                    <li>Select your Facebook account<br/><img src={require('../img/facebook3.png')} /></li>
+                    <li>Click <strong>All available information</strong><br/><img src={require('../img/instagram4.png')} /></li>
+                    <li>Click <strong>Download to device</strong><br/><img src={require('../img/instagram5.png')} /></li>
+                    <li>Select <strong>Format: JSON</strong> and the <strong>Date range</strong> and <strong>Media quality</strong> you desire<br/><img src={require('../img/instagram6.png')} /></li>
+                    <li>Your request has been sent and it might take a couple of hours or days<br/><img src={require('../img/instagram7.png')} /></li>
+                    <li>Download your data when you have received this email from Facebook, your data downloads should be files in the form of <strong>facebook-xxxx-xxx.zip</strong><br/><img src={require('../img/facebook8.png')} /></li>
+                </ol>
+                }/>
+              }
+              {/* {
+                instructionCard === 'x' &&
+                <Card toggleCard={() => {setInstructionCard('')}} title='Download your data from X (Twitter)' content=
+                {
+                  <ol>
+                    <li>Go to <a href='https://x.com/settings/download_your_data' target='_blank'>https://x.com/settings/download_your_data</a> while logged in to your Twitter account</li>
+                    <li>Click <strong>Request archive</strong><br/><img src={require('../img/twitter1.png')} /></li>
+                    <li>Your request has been sent and it might take a couple of hours or days<br/><img src={require('../img/twitter2.png')} /></li>
+                    <li>Download your data when you have received this email from Twitter, your data downloads should be files in the form of <strong>twitter-xxxx-xxx.zip</strong><br/><img src={require('../img/twitter3.png')} /></li>
+                </ol>
+                }/>
+              } */}
+              {
                 instructionCard === 'linkedin' &&
                 <Card toggleCard={() => {setInstructionCard('')}} title='Download your data from LinkedIn' content=
                 {
                   <ol>
-                    <li>Follow the instructions on <a href='https://www.linkedin.com/help/linkedin/answer/a1339364/downloading-your-account-data' target='_blank'>https://www.linkedin.com/help/linkedin/answer/a1339364/downloading-your-account-data</a>, these steps are written with reference to it</li>
                     <li>Go to your LinkedIn homepage: <a href='https://www.linkedin.com/feed/' target='_blank'>https://www.linkedin.com/feed/</a></li>
                     <li>Click <strong>Me</strong> below your profile picture and select <strong>Settings and Privacy</strong> from the dropdown<br/><img src={require('../img/linkedin1.png')}/></li>
                     <li>Select <strong>Data Privacy</strong> and click <strong>Get a copy of your data</strong><br/><img src={require('../img/linkedin2.png')}/></li>
                     <li>Select the data you want to include and click <strong>Request archive</strong><br/><img src={require('../img/linkedin3.png')}/></li>
                     <li>Your request has been sent and it might take a couple of hours or days<br/><img src={require('../img/linkedin4.png')}/></li>
-                    <li>Download your data when you have received the corresponding email from LinkedIn</li>
+                    <li>Download your data when you have received this email from LinkedIn, (you will have received an email for the first part of your data, <strong>please wait until you receive and download the second part of your data</strong>), your data downloads should be files in the form of <strong>Complete_LinkedInDataExport_xxxx-xxx.zip</strong><br/><img src={require('../img/linkedin5.png')} /></li>
                 </ol>
                 }/>
               }
@@ -754,8 +1015,9 @@ const Home = () => {
           <Location db={ db } isHome={ true }/>
           <Interests db={ db } isHome={ true }/>
           <Pi db={ db } isHome={ true }/>
-          <Instagram db={ db } isHome={ true }/>
           <Google db={ db } isHome={ true }/>
+          <Instagram db={ db } isHome={ true }/>
+          <Linkedin db={ db } isHome={ true }/>
         </div>
       </div>
     </div>
