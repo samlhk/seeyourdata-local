@@ -9,7 +9,7 @@ const Pi = ({ db, isHome }) => {
 
   return (
     isHome ?
-      (db.piPhone || db.piLocation || db.piIp || db.piDevice ?
+      (db.piPhone || db.piLocation || db.piIp || db.piDevice || db.piPayment ?
         <div className='explore-more-container' onClick={ () => navigate('/pi') }>
           <div className='blocker'></div>
           <div className='explore-more-bar'>

@@ -53,6 +53,13 @@ const Dialogue = ({ db, isHome }) => {
     setChatId(null);
   }
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      askChatbot();
+    }
+  }
+
   return (
     db && Object.keys(db).length > 0 ?
       <div className='dialogue-container'>
@@ -93,6 +100,10 @@ const Dialogue = ({ db, isHome }) => {
                   <Prompter prompt='What kind of things do I browse on the Internet and different online platforms?' setPrompt={setPrompt}/><br/>
                   <h6>LinkedIn</h6>
                   <Prompter prompt='What would be a good job suitable for me?' setPrompt={setPrompt}/>
+                  <Prompter prompt='Can you write me a self introduction for myself for a job based on what you know about me?' setPrompt={setPrompt}/>
+                  <h6>Spotify</h6>
+                  <Prompter prompt='What do you think my music taste is like, recommend me some songs I may like.' setPrompt={setPrompt}/>
+                  <Prompter prompt='What does how I listen to music tell you about my life?' setPrompt={setPrompt}/>
               </>
             }
           />
@@ -123,7 +134,7 @@ const Dialogue = ({ db, isHome }) => {
           )
         }
         <div className='prompt-container'>
-          <textarea name="prompt" rows="2" value={ prompt } onChange={(e) => { setPrompt(e.target.value) }}></textarea>
+          <textarea name="prompt" rows="2" value={ prompt } onKeyDown={ handleKeyDown } onChange={(e) => { setPrompt(e.target.value) }}></textarea>
           <button className='mt-1' onClick={ askChatbot } disabled={ aiChats[aiChats.length - 1] === generatingPrompt }>Send</button>
         </div>
       </div> : <></>

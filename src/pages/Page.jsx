@@ -8,6 +8,7 @@ import Pi from '../components/pi/Pi';
 import Google from '../components/google/Google';
 import NavBar from '../components/NavBar';
 import Linkedin from '../components/linkedin/Linkedin';
+import Spotify from '../components/spotify/Spotify';
 
 const Page = ({ category }) => {
 
@@ -34,6 +35,7 @@ const Page = ({ category }) => {
           {category === 'google' && <Google db={ db }/> }
           {category === 'instagram' && <Instagram db={ db }/> }
           {category === 'linkedin' && <Linkedin db={ db }/> }
+          {category === 'spotify' && <Spotify db={ db }/> }
         </div>
       </div>
     </div>

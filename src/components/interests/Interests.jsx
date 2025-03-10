@@ -18,7 +18,14 @@ const Interests = ({ db, isHome }) => {
           <div className='explore-more-bar'>
             <button className='explore-more-indicator'>Explore More <FaLongArrowAltRight/></button>
           </div>
-          <InterestsWordCloud db = { db } type='postedTopics' title='Topics from posted content' />
+          {
+            db.postedTopics ? <InterestsWordCloud db = { db } type='postedTopics' title='Topics from posted content' /> :
+            db.messagedTopics ? <InterestsWordCloud db = { db } type='messagedTopics' title='Topics from private messages'/> :
+            db.advertisers ? <InterestsWordCloudRefresh db = { db } type='advertisers' title='Your advertisers'/> :
+            db.recommendedTopics ? <InterestsWordCloudRefresh db = { db } type='recommendedTopics' title='Topics for content recommendations'/> :
+            db.searchedTopics ? <InterestsWordCloud db = { db } type='searchedTopics' title='Topics you have searched for'/> :
+            <InterestsWordCloud db = { db } type='viewedTopics' title='Topics you have viewed'/>
+          }
         </div> : <></>) :
       <>
         <InterestsWordCloud db = { db } type='postedTopics' title='Topics from posted content' 
@@ -28,14 +35,14 @@ const Interests = ({ db, isHome }) => {
         />
         <Summary db = { db } category='Interests'/>
         <SentimentDistribution db = { db } type='postedSentiment' title='Sentiment scores from posted content'
-          description='Sentiment scores from content you have posted publicly, generated with AFINN-based sentiment analysis, ranges from -5 to 5, you can select what posted content you want to view'
+          description='Sentiment scores from content you have posted publicly, generated with AFINN-based sentiment analysis, ranges from -5 to 5, you can select what posted content you want to view (Sentiment score: how positive or negative is your text)'
           sources={['Instagram post and reel comments']}  
         />
         <InterestsWordCloud db = { db } type='messagedTopics' title='Topics from private messages'
           description='Topics from your private messages, generated with LDA topic modelling'
         />
         <SentimentDistribution db = { db } type='messagedSentiment' title='Sentiment scores from private messages'
-          description='Sentiment scores from your private messages, generated with AFINN-based sentiment analysis, ragnes from -5 to 5, you can select what messages you want to view'
+          description='Sentiment scores from your private messages, generated with AFINN-based sentiment analysis, ragnes from -5 to 5, you can select what messages you want to view (Sentiment score: how positive or negative is your text)'
         />
         <InterestsWordCloudRefresh db = { db } type='advertisers' title='Your advertisers'
           description='Advertisers using your activity or information, refresh to see more advertisers'

@@ -5,8 +5,8 @@ const PiInformation = ({ db }) => {
 
   const [pis, setPis] = useState();
 
-  const types = ['Phone', 'Location', 'Zipcode']; //, 'Ip', 'Device'];
-  const displayNames = ['Phone numbers', 'Locations', 'Zip codes']; // 'IP addresses', 'Devices'];
+  const types = ['Demographic', 'Phone', 'Location', 'Zipcode', 'Payment']; //, 'Ip', 'Device'];
+  const displayNames = ['Demographics', 'Phone numbers', 'Locations', 'Zip codes', 'Payment method']; // 'IP addresses', 'Devices'];
 
   useEffect(() => {
     render();

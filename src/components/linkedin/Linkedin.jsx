@@ -7,7 +7,7 @@ import Summary from '../ai/Summary';
 import LinkedinActivity from './LinkedinActivity';
 import GoogleRanking from '../google/GoogleRanking';
 import LinkedinConnections from './LinkedinConnections';
-import LinkedinProfile from './LinkedinProfile';
+import Profile from './Profile';
 
 
 const Linkedin = ({ db, isHome }) => {
@@ -16,7 +16,7 @@ const Linkedin = ({ db, isHome }) => {
 
   return (
     isHome ? 
-      ((db.activity && db.activity.find(({app}) => app.includes('linkedin'))) ?
+      ((db.activity && db.activity.find(({app}) => app.includes('linkedin'))) || db.connectedCompanies || db.connectedPositions || db.connections || db.linkedinProfile ?
         <div className='explore-more-container' onClick={ () => navigate('/linkedin') }>
           <div className='blocker'></div>
           <div className='explore-more-bar'>
@@ -27,7 +27,12 @@ const Linkedin = ({ db, isHome }) => {
       <>
         <LinkedinConnections db = { db }/>
         <Summary db = { db } category='LinkedIn usage'/>
-        <LinkedinProfile db = { db }/>
+        <Profile db = { db } category='linkedinProfile' basic={true} title='LinkedIn profile'
+          description='Your profile according to LinkedIn for ad targetting purposes'
+          benefits='This information can help LinkedIn deliver suitable recommendations for jobs or posts to you'
+          harms='There may be privacy concerns with this data and incorrect inferences'
+          sources={['LinkedIn Ad_Targeting.csv']}
+        />
         <LinkedinActivity db = { db } colors = { shuffleSeed.shuffle(colorScheme[1], 'z') }/>
         <GoogleRanking db = { db } category='connectedCompanies' title='Top companies your connections work for'
           description='The top companies your connections work for'

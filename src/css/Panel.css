@@ -20,11 +20,11 @@ td {
 
 /* Linkedin */
 
-.linkedin-container {
+.profile-container {
     max-height: 50vh;
 }
 
-.profile-container {
+.profile-inner-container {
     display: flex;
     flex-direction: column;
 }

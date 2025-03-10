@@ -1,8 +1,16 @@
 const jsonToMd = (json) => {
   const md = [];
 
-  if (json.activity) {
-    json.activity.forEach(({app, timestamps}) => {
+  if (json.activity || json.spotify) {
+    const activities = json.activity || [];
+    if (json.spotify) {
+      for (const media of ['music', 'audiobook', 'podcast']) {
+        if (json.spotify[media]) {
+          activities.push({ app: `spotify ${media}`, timestamps: json.spotify[media].map(({timestamp}) => timestamp) })
+        }
+      }
+    }
+    activities.forEach(({app, timestamps}) => {
       if (!app.includes('instagram: chats with')) {
         let summary = '';
         summary = summary + `user accessed the service: ${app}: ${timestamps.length} times`;
@@ -91,6 +99,12 @@ const jsonToMd = (json) => {
   //   md.push(`the user has viewed content related the following topics: ${json.viewedTopics.map(({topic}) => topic)}`);
   // }
 
+  if (json.piDemographic) {
+    json.piDemographic.forEach(({source, list}) => {
+      md.push(`the user has the following demographics inferred by ${source}: ${list}`);
+    })
+  }
+
   if (json.piPhone) {
     json.piPhone.forEach(({source, list}) => {
       md.push(`the user has the following phone numbers on ${source}: ${list}`);
@@ -108,6 +122,12 @@ const jsonToMd = (json) => {
       md.push(`the user has used ${source} from these zip codes: ${list}`);
     })
   }
+
+  // if (json.piPayment) {
+  //   json.piPayment.forEach(({source, list}) => {
+  //     md.push(`the user has these payment methods from ${source}: ${list}`);
+  //   })
+  // }
 
   // if (json.piIp) {
   //   json.piIp.forEach(({source, list}) => {
@@ -183,6 +203,41 @@ const jsonToMd = (json) => {
     json.linkedinProfile.forEach(({field, values}) => {
       md.push(`LinkedIn has inferred that the user's ${field} is: ${values}`);
     })
+  }
+
+  if (json.spotify) {
+    if (json.spotify.music) {
+      let songRecord = {};
+      let artistRecord = {};
+      for (const item of json.spotify.music) {
+        songRecord[item.name] = (songRecord[item.name] || 0) + 1;
+        artistRecord[item.artist] = (artistRecord[item.artist] || 0) + 1;
+      }
+      md.push(`The user has listened most to these songs on Spotify: ${Object.keys(songRecord).sort((item1, item2) => songRecord[item2] - songRecord[item1]).slice(0, 10)}`);
+      md.push(`The user has listened most to these artists on Spotify: ${Object.keys(artistRecord).sort((item1, item2) => artistRecord[item2] - artistRecord[item1]).slice(0, 10)}`);
+    }
+    if (json.spotify.audiobook) {
+      let record = {};
+      for (const item of json.spotify.audiobook) {
+        record[item.name] = (record[item.name] || 0) + 1;
+      }
+      md.push(`The user has listened most to these audiobooks on Spotify: ${Object.keys(record).sort((item1, item2) => record[item2] - record[item1]).slice(0, 10)}`);
+    }
+    if (json.spotify.podcast) {
+      let record = {};
+      for (const item of json.spotify.podcast) {
+        record[item.name] = (record[item.name] || 0) + 1;
+      }
+      md.push(`The user has listened most to these podcasts on Spotify: ${Object.keys(record).sort((item1, item2) => record[item2] - record[item1]).slice(0, 10)}`);
+    }
+  }
+
+  if (json.spotifyProfile) {
+    let inferences = [];
+    json.spotifyProfile.forEach(({values}) => {
+      inferences = inferences.concat(values);
+    })
+    md.push(`Spotify has inferred the following about the user: ${inferences}`);
   }
 
   return md.join('\n');

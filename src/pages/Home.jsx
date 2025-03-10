@@ -14,21 +14,18 @@ import InfoCard from '../components/InfoCard';
 import NavBar from '../components/NavBar';
 import Papa from 'papaparse';
 import Linkedin from '../components/linkedin/Linkedin';
+import Spotify from '../components/spotify/Spotify';
 const { parse } = require('node-html-parser');
 const lda = require('lda');
 const Sentiment = require('sentiment');
 
 const Home = () => {
-  const [fileUploadStatus, setFileUploadStatus] = useState("");
+  const [processing, setProcessing] = useState(false);
   const [file, setFile] = useState();
   const [downloadFiles, setDownloadFiles] = useState([]);
   const [dbPath, setDBPath] = useState('');
   const [instructionCard, setInstructionCard] = useState('');
-  const [deleteCard, setDeleteCard] = useState('');
   const [db, setDB] = useState({});
-
-  const warningStatusPrefix = 'Warning: ';
-  const loadingStatus = 'Loading';
 
   useEffect(() => {
     fetchDB();
@@ -54,14 +51,22 @@ const Home = () => {
     else setDownloadFiles([]);
   }
 
+  const addLog = async (log, replace = false) => {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    const logContainer = document.getElementById('upload-progress-container');
+    if (replace) logContainer.innerHTML = log;
+    else logContainer.innerHTML += log;
+  }
+
   const uploadFile = async () => {
-    setFileUploadStatus(loadingStatus);
+    addLog("<div>Uploading: please wait and do not refresh or close the window, this might take a while depending on file size and your computer</div>", true);
 
     if (file) {
 
       if (!file.name.match(/.zip$/)) {
         alert('Please upload a zip file');
-        setFileUploadStatus(warningStatusPrefix + 'File has to be zip file');
+        addLog("<div class='warning'>File has to be zip file</div>", true);
+        setProcessing(false);
         return
       }
 
@@ -70,7 +75,8 @@ const Home = () => {
         await zip.loadAsync(file);
       } catch {
         alert(`File size: ${Math.round(file.size * 9.3132257461548E-10 * 100) / 100}GB too large, please limit it below 2GB by removing some files in your zip file, for example, you can remove the "Drive" folder in a Google download`);
-        setFileUploadStatus(warningStatusPrefix + 'File too large')
+        addLog("<div class='warning'>File too large</div>", true);
+        setProcessing(false);
         return
       } 
 
@@ -172,6 +178,13 @@ const Home = () => {
         db[category] = list;
       }
 
+      // Spotify
+
+      const addSpotify = (media, list) => {
+        if (!db.spotify) db.spotify = {};
+        db.spotify[media] = list;
+      }
+
       try {
 
         // ---------------------------------
@@ -181,7 +194,7 @@ const Home = () => {
         let instagramViewedAdsFile = zip.file('ads_information/ads_and_topics/ads_viewed.json') ||
           zip.file(innerZipFolder + 'ads_information/ads_and_topics/ads_viewed.json');
         if (instagramViewedAdsFile) {
-          console.log('Processing instagram viewed ads');
+          addLog("<div>Processing Instagram viewed ads</div>");
           const data = await instagramViewedAdsFile.async('text');
           const json = JSON.parse(data);
           const timestamps = json.impressions_history_ads_seen.map(obj => new Date(obj.string_map_data.Time.timestamp * 1000).toString());
@@ -193,7 +206,7 @@ const Home = () => {
         let instagramViewedPostsFile = zip.file('ads_information/ads_and_topics/posts_viewed.json') ||
           zip.file(innerZipFolder + 'ads_information/ads_and_topics/posts_viewed.json');
         if (instagramViewedPostsFile) {
-          console.log('Processing instagram viewed posts');
+          addLog("<div>Processing Instagram viewed posts</div>");
           const data = await instagramViewedPostsFile.async('text');
           const json = JSON.parse(data);
           const timestamps = json.impressions_history_posts_seen.map(obj => new Date(obj.string_map_data.Time.timestamp * 1000).toString());
@@ -205,7 +218,7 @@ const Home = () => {
         let instagramViewedSuggestedProfilesFile = zip.file('ads_information/ads_and_topics/suggested_profiles_viewed.json') ||
           zip.file(innerZipFolder + 'ads_information/ads_and_topics/suggested_profiles_viewed.json');
         if (instagramViewedSuggestedProfilesFile) {
-          console.log('Processing instagram viewed suggested profiles');
+          addLog("<div>Processing Instagram viewed suggested profiles</div>");
           const data = await instagramViewedSuggestedProfilesFile.async('text');
           const json = JSON.parse(data);
           const timestamps = json.impressions_history_chaining_seen.map(obj => new Date(obj.string_map_data.Time.timestamp * 1000).toString());
@@ -217,7 +230,7 @@ const Home = () => {
         let instagramViewedVideosFile = zip.file('ads_information/ads_and_topics/videos_watched.json') ||
           zip.file(innerZipFolder + 'ads_information/ads_and_topics/videos_watched.json');
         if (instagramViewedVideosFile) {
-          console.log('Processing instagram viewed videos');
+          addLog("<div>Processing Instagram viewed videos</div>");
           const data = await instagramViewedVideosFile.async('text');
           const json = JSON.parse(data);
           const timestamps = json.impressions_history_videos_watched.map(obj => new Date(obj.string_map_data.Time.timestamp * 1000).toString());
@@ -229,7 +242,7 @@ const Home = () => {
         let instagramAdvertisersFile = zip.file('ads_information/instagram_ads_and_businesses/advertisers_using_your_activity_or_information.json') ||
           zip.file(innerZipFolder + 'ads_information/instagram_ads_and_businesses/advertisers_using_your_activity_or_information.json');
         if (instagramAdvertisersFile) {
-          console.log('Processing instagram advertisers');
+          addLog("<div>Processing Instagram advertisers</div>");
           const data = await instagramAdvertisersFile.async('text');
           const json = JSON.parse(data);
           const advertisers = json.ig_custom_audiences_all_types.map(obj => obj.advertiser_name);
@@ -239,7 +252,7 @@ const Home = () => {
         let instagramPhoneFile = zip.file('personal_information/information_about_you/possible_phone_numbers.json') ||
           zip.file(innerZipFolder + 'personal_information/information_about_you/possible_phone_numbers.json');
         if (instagramPhoneFile) {
-          console.log('Processing instagram phone number');
+          addLog("<div>Processing Instagram phone number</div>");
           const data = await instagramPhoneFile.async('text');
           const json = JSON.parse(data);
           const phones = [];
@@ -253,7 +266,7 @@ const Home = () => {
         let instagramLocationFile = zip.file('personal_information/information_about_you/profile_based_in.json') ||
           zip.file(innerZipFolder + 'personal_information/information_about_you/profile_based_in.json');
         if (instagramLocationFile) {
-          console.log('Processing instagram location');
+          addLog("<div>Processing Instagram location</div>");
           const data = await instagramLocationFile.async('text');
           const json = JSON.parse(data);
           const locations = [];
@@ -266,7 +279,7 @@ const Home = () => {
         let instagramRecommendedTopicsFile = zip.file('preferences/your_topics/recommended_topics.json') ||
           zip.file(innerZipFolder + 'preferences/your_topics/recommended_topics.json');
         if (instagramRecommendedTopicsFile) {
-          console.log('Processing instagram recommended topics');
+          addLog("<div>Processing Instagram recommended topics</div>");
           const data = await instagramRecommendedTopicsFile.async('text');
           const json = JSON.parse(data);
           const topics = json.topics_your_topics.map(obj => obj.string_map_data.Name.value);
@@ -276,7 +289,7 @@ const Home = () => {
         let instagramOffMetaActivityFile = zip.file('apps_and_websites_off_of_instagram/apps_and_websites/your_activity_off_meta_technologies.json') ||
           zip.file(innerZipFolder + 'apps_and_websites_off_of_instagram/apps_and_websites/your_activity_off_meta_technologies.json');
         if (instagramOffMetaActivityFile) {
-          console.log(`Processing instagram off meta activity`);
+          addLog("<div>Processing Instagram off meta activity</div>");
           const data = await instagramOffMetaActivityFile.async('text');
           const json = JSON.parse(data);
           json.apps_and_websites_off_meta_activity.forEach(({ name, events }) => {
@@ -288,7 +301,7 @@ const Home = () => {
         let instagramActivityFile = zip.file('security_and_login_information/login_and_profile_creation/login_activity.json') ||
           zip.file(innerZipFolder + 'security_and_login_information/login_and_profile_creation/login_activity.json');
         if (instagramActivityFile) {
-          console.log('Processing instagram log in activity');
+          addLog("<div>Processing Instagram log in activity</div>");
           const data = await instagramActivityFile.async('text');
           const json = JSON.parse(data);
           const timestamps = json.account_history_login_history.map(({ title }) => title);
@@ -309,7 +322,7 @@ const Home = () => {
         let instagramPostCommentsFile = zip.file('your_instagram_activity/comments/post_comments_1.json') ||
           zip.file(innerZipFolder + 'your_instagram_activity/comments/post_comments_1.json');
         if (instagramPostCommentsFile) {
-          console.log(`Processing instagram post comments`);
+          addLog("<div>Processing Instagram post comments</div>");
           const data = await instagramPostCommentsFile.async('text');
           const json = JSON.parse(data);
           const timestamps = json.map(obj => new Date(obj.string_map_data.Time.timestamp * 1000).toString());
@@ -323,7 +336,7 @@ const Home = () => {
         let instagramReelsCommentsFile = zip.file('your_instagram_activity/comments/reels_comments.json') ||
           zip.file(innerZipFolder + 'your_instagram_activity/comments/reels_comments.json');
         if (instagramReelsCommentsFile) {
-          console.log(`Processing instagram reels comments`);
+          addLog("<div>Processing Instagram reels comments</div>");
           const data = await instagramReelsCommentsFile.async('text');
           const json = JSON.parse(data);
           const timestamps = json.comments_reels_comments.map(obj => new Date(obj.string_map_data.Time.timestamp * 1000).toString());
@@ -337,7 +350,7 @@ const Home = () => {
         let instagramLikedPostsFile = zip.file('your_instagram_activity/likes/liked_posts.json') ||
           zip.file(innerZipFolder + 'your_instagram_activity/likes/liked_posts.json');
         if (instagramLikedPostsFile) {
-          console.log('Processing instagram liked posts');
+          addLog("<div>Processing Instagram liked posts</div>");
           const data = await instagramLikedPostsFile.async('text');
           const json = JSON.parse(data);
           const timestamps = json.likes_media_likes.map(obj => new Date(obj.string_list_data[0].timestamp * 1000).toString());
@@ -349,7 +362,7 @@ const Home = () => {
         let instagramLikedCommentsFile = zip.file('your_instagram_activity/likes/liked_comments.json') ||
           zip.file(innerZipFolder + 'your_instagram_activity/likes/liked_comments.json');
         if (instagramLikedCommentsFile) {
-          console.log('Processing instagram liked comments');
+          addLog("<div>Processing Instagram liked comments</div>");
           const data = await instagramLikedCommentsFile.async('text');
           const json = JSON.parse(data);
           const timestamps = json.likes_comment_likes.map(obj => new Date(obj.string_list_data[0].timestamp * 1000).toString());
@@ -361,7 +374,7 @@ const Home = () => {
         let instagramLikedStoriesFile = zip.file('your_instagram_activity/story_sticker_interactions/story_likes.json') ||
           zip.file(innerZipFolder + 'your_instagram_activity/story_sticker_interactions/story_likes.json');
         if (instagramLikedStoriesFile) {
-          console.log('Processing instagram liked stories');
+          addLog("<div>Processing Instagram liked stories</div>");
           const data = await instagramLikedStoriesFile.async('text');
           const json = JSON.parse(data);
           const timestamps = json.story_activities_story_likes.map(obj => new Date(obj.string_list_data[0].timestamp * 1000).toString());
@@ -377,7 +390,7 @@ const Home = () => {
           .forEach((relativePath, file) => {{if (relativePath.match(/\/message_1.json$/)) instagramMessagesFiles.push(file);}});
         let allMessageTimestamps = [];
         for await (const file of instagramMessagesFiles) {
-          console.log(`Processing instagram messages in file: ${file.name}`);
+          addLog(`<div>Processing Instagram messages in file: ${file.name}</div>`);
           const data = await file.async('text');
           const json = JSON.parse(data);
           const participants = json.participants;
@@ -395,7 +408,7 @@ const Home = () => {
         let instagramStoryEmojiSlidersFile = zip.file('your_instagram_activity/story_sticker_interactions/emoji_sliders.json') ||
           zip.file(innerZipFolder + 'your_instagram_activity/story_sticker_interactions/emoji_sliders.json');
         if (instagramStoryEmojiSlidersFile) {
-          console.log('Processing instagram story emoji sliders');
+          addLog("<div>Processing Instagram story emoji sliders</div>");
           const data = await instagramStoryEmojiSlidersFile.async('text');
           const json = JSON.parse(data);
           const timestamps = json.story_activities_emoji_sliders.map(obj => new Date(obj.string_list_data[0].timestamp * 1000).toString());
@@ -407,7 +420,7 @@ const Home = () => {
         let instagramStoryPollsFile = zip.file('your_instagram_activity/story_sticker_interactions/polls.json') ||
           zip.file(innerZipFolder + 'your_instagram_activity/story_sticker_interactions/polls.json');
         if (instagramStoryPollsFile) {
-          console.log('Processing instagram story polls');
+          addLog("<div>Processing Instagram story polls</div>");
           const data = await instagramStoryPollsFile.async('text');
           const json = JSON.parse(data);
           const timestamps = json.story_activities_polls.map(obj => new Date(obj.string_list_data[0].timestamp * 1000).toString());
@@ -419,7 +432,7 @@ const Home = () => {
         let instagramStoryQuestionsFile = zip.file('your_instagram_activity/story_sticker_interactions/questions.json') ||
           zip.file(innerZipFolder + 'your_instagram_activity/story_sticker_interactions/questions.json');
         if (instagramStoryQuestionsFile) {
-          console.log('Processing instagram story questions');
+          addLog("<div>Processing Instagram story questions</div>");
           const data = await instagramStoryQuestionsFile.async('text');
           const json = JSON.parse(data);
           const timestamps = json.story_activities_questions.map(obj => new Date(obj.string_list_data[0].timestamp * 1000).toString());
@@ -431,7 +444,7 @@ const Home = () => {
         let instagramStoryQuizzesFile = zip.file('your_instagram_activity/story_sticker_interactions/quizzes.json') ||
           zip.file(innerZipFolder + 'your_instagram_activity/story_sticker_interactions/quizzes.json');
         if (instagramStoryQuizzesFile) {
-          console.log('Processing instagram story quizzes');
+          addLog("<div>Processing Instagram story quizzes</div>");
           const data = await instagramStoryQuizzesFile.async('text');
           const json = JSON.parse(data);
           const timestamps = json.story_activities_quizzes.map(obj => new Date(obj.string_list_data[0].timestamp * 1000).toString());
@@ -443,7 +456,7 @@ const Home = () => {
         let instagramStoryCountdownsFile = zip.file('your_instagram_activity/story_sticker_interactions/countdowns.json') ||
           zip.file(innerZipFolder + 'your_instagram_activity/story_sticker_interactions/countdowns.json');
         if (instagramStoryCountdownsFile) {
-          console.log('Processing instagram story countdowns');
+          addLog("<div>Processing Instagram story countdowns</div>");
           const data = await instagramStoryCountdownsFile.async('text');
           const json = JSON.parse(data);
           const timestamps = json.story_activities_countdowns.map(obj => new Date(obj.string_list_data[0].timestamp * 1000).toString());
@@ -465,12 +478,11 @@ const Home = () => {
         let facebookAdvertisersFile = zip.file('ads_information/advertisers_using_your_activity_or_information.json') ||
           zip.file(innerZipFolder + 'ads_information/advertisers_using_your_activity_or_information.json');
         if (facebookAdvertisersFile) {
-          console.log('Processing facebook advertisers');
+          addLog("<div>Processing Facebook advertisers</div>");
           const data = await facebookAdvertisersFile.async('text');
           const json = JSON.parse(data);
           if (label_values_ok(json.label_values)) {
             const advertisers = json.label_values[0].vec.map(({value}) => value);
-            console.log(advertisers);
             addTopics('advertisers', 'facebook', advertisers);
           }
         }
@@ -478,7 +490,7 @@ const Home = () => {
         let facebookOffMetaActivityFile = zip.file('apps_and_websites_off_of_facebook/your_activity_off_meta_technologies.json') ||
           zip.file(innerZipFolder + 'apps_and_websites_off_of_instagram/apps_and_websites/your_activity_off_meta_technologies.json');
         if (facebookOffMetaActivityFile) {
-          console.log(`Processing facebook off meta activity`);
+          addLog("<div>Processing Facebook off meta activity</div>");
           const data = await facebookOffMetaActivityFile.async('text');
           const json = JSON.parse(data);
           json.forEach(({ title, label_values }) => {
@@ -492,7 +504,7 @@ const Home = () => {
         let facebookPrimaryLocationFile = zip.file('logged_information/location/primary_location.json') ||
           zip.file(innerZipFolder + 'logged_information/location/primary_location.json');
         if (facebookPrimaryLocationFile) {
-          console.log('Processing facebook primary location');
+          addLog("<div>Processing Facebook primary location</div>");
           const data = await facebookPrimaryLocationFile.async('text');
           const json = JSON.parse(data);
           if (json.primary_location_v2?.city_region_pairs.length > 0) {
@@ -507,7 +519,7 @@ const Home = () => {
         let facebookPrimaryPublicLocationFile = zip.file('logged_information/location/primary_public_location.json') ||
           zip.file(innerZipFolder + 'logged_information/location/primary_public_location.json');
         if (facebookPrimaryPublicLocationFile) {
-          console.log('Processing facebook primary public location');
+          addLog("<div>Processing Facebook primary public location</div>");
           const data = await facebookPrimaryPublicLocationFile.async('text');
           const json = JSON.parse(data);
           if (json.primary_public_location_v2) {
@@ -519,7 +531,7 @@ const Home = () => {
         let facebookLocationsOfInterestFile = zip.file('logged_information/other_logged_information/locations_of_interest.json') ||
           zip.file(innerZipFolder + 'logged_information/other_logged_information/locations_of_interest.json');
         if (facebookLocationsOfInterestFile) {
-          console.log('Processing facebook locations of interest');
+          addLog("<div>Processing Facebook locations of interest</div>");
           const data = await facebookLocationsOfInterestFile.async('text');
           const json = JSON.parse(data);
           if (label_values_ok(json.label_values)) {
@@ -531,7 +543,7 @@ const Home = () => {
         let facebookAdsInterestsFile = zip.file('logged_information/other_logged_information/ads_interests.json') ||
           zip.file(innerZipFolder + 'logged_information/other_logged_information/ads_interests.json');
         if (facebookAdsInterestsFile) {
-          console.log('Processing facebook ads interests');
+          addLog("<div>Processing Facebook ads interests</div>");
           const data = await facebookAdsInterestsFile.async('text');
           const json = JSON.parse(data);
           addTopics('recommendedTopics', 'facebook', json.topics_v2);
@@ -540,7 +552,7 @@ const Home = () => {
         let facebookSearchHistoryFile = zip.file('logged_information/search/your_search_history.json') ||
           zip.file(innerZipFolder + 'logged_information/search/your_search_history.json');
         if (facebookSearchHistoryFile) {
-          console.log('Processing facebook search history');
+          addLog("<div>Processing Facebook search history</div>");
           const data = await facebookSearchHistoryFile.async('text');
           const json = JSON.parse(data);
           if (json.searches_v2) {
@@ -555,7 +567,7 @@ const Home = () => {
         let facebookAccountActivityFile = zip.file('security_and_login_information/account_activity.json') ||
           zip.file(innerZipFolder + 'security_and_login_information/account_activity.json');
         if (facebookAccountActivityFile) {
-          console.log('Processing facebook account activity');
+          addLog("<div>Processing Facebook account activity</div>");
           const data = await facebookAccountActivityFile.async('text');
           const json = JSON.parse(data);
           const timestamps = json.account_activity_v2.map(({timestamp}) => new Date(timestamp * 1000).toString());
@@ -586,7 +598,7 @@ const Home = () => {
           let file = zip.file(`Takeout/My Activity/${app}/My Activity.html`) || zip.file(`Takeout/My Activity/${app}/MyActivity.html`) ||
             zip.file(innerZipFolder + `Takeout/My Activity/${app}/My Activity.html`) || zip.file(innerZipFolder + `Takeout/My Activity/${app}/MyActivity.html`);
           if (file) {
-            console.log(`Processing google ${app}`);
+            addLog(`<div>Processing Google ${app}</div>`);
             const data = await file.async('text');
             const root = parse(data);
             const divElements = root.getElementsByTagName('div');
@@ -614,7 +626,7 @@ const Home = () => {
         let googlePlayStoreFile = zip.file('Takeout/My Activity/Google Play Store/My Activity.html') || zip.file('Takeout/My Activity/Google Play Store/MyActivity.html') || 
           zip.file(innerZipFolder + 'Takeout/My Activity/Google Play Store/My Activity.html') || zip.file(innerZipFolder + 'Takeout/My Activity/Google Play Store/MyActivity.html') ;
         if (googlePlayStoreFile) {
-          console.log('Processing google play store');
+          addLog("<div>Processing Google Play Store</div>");
           const data = await googlePlayStoreFile.async('text');
           const root = parse(data);
           const divElements = root.getElementsByTagName('div');
@@ -631,7 +643,7 @@ const Home = () => {
         let googleMapsFile = zip.file('Takeout/My Activity/Maps/My Activity.html') || zip.file('Takeout/My Activity/Maps/MyActivity.html') || 
           zip.file(innerZipFolder + 'Takeout/My Activity/Maps/My Activity.html') || zip.file(innerZipFolder + 'Takeout/My Activity/Maps/MyActivity.html');
         if (googleMapsFile) {
-          console.log('Processing google maps');
+          addLog("<div>Processing Google Maps</div>");
           const data = await googleMapsFile.async('text');
           const root = parse(data);
           const linkElements = root.getElementsByTagName('a');
@@ -656,7 +668,7 @@ const Home = () => {
         let googleYoutubeFile = zip.file(`Takeout/My Activity/YouTube/My Activity.html`) || zip.file(`Takeout/My Activity/YouTube/MyActivity.html`) || 
             zip.file(innerZipFolder + `Takeout/My Activity/YouTube/My Activity.html`) || zip.file(innerZipFolder + `Takeout/My Activity/YouTube/MyActivity.html`);
           if (googleYoutubeFile) {
-            console.log(`Processing Youtube`);
+            addLog("<div>Processing YouTube</div>");
             const data = await googleYoutubeFile.async('text');
             const root = parse(data);
             const divElements = root.getElementsByTagName('div');
@@ -689,7 +701,7 @@ const Home = () => {
         let linkedinAdsClickedFile = zip.file('Ads Clicked.csv') ||
           zip.file(innerZipFolder + 'Ads Clicked.csv');
         if (linkedinAdsClickedFile) {
-          console.log('Processing linkedin ads clicked');
+          addLog("<div>Processing LinkedIn ads clicked</div>");
           const data = await linkedinAdsClickedFile.async('text');
           const csv = Papa.parse(data);
           const timestamps = csv.data.slice(1, -1).map(arr => new Date(arr[0]).toString());
@@ -699,7 +711,7 @@ const Home = () => {
         let linkedinLoginsFile = zip.file('Logins.csv') ||
           zip.file(innerZipFolder + 'Logins.csv');
         if (linkedinLoginsFile) {
-          console.log('Processing linkedin logins');
+          addLog("<div>Processing LinkedIn logins</div>");
           const data = await linkedinLoginsFile.async('text');
           const csv = Papa.parse(data);
           const timestamps = csv.data.slice(1, -1).map(arr => new Date(arr[0]).toString());
@@ -719,7 +731,7 @@ const Home = () => {
         let linkedinMessagesFile = zip.file('messages.csv') ||
         zip.file(innerZipFolder + 'messages.csv');
         if (linkedinProfileFile && linkedinMessagesFile) {
-          console.log('Processing linkedin messages');
+          addLog("<div>Processing LinkedIn messages</div>");
           const profileData = await linkedinProfileFile.async('text');
           const profileCsv = Papa.parse(profileData);
           const you = profileCsv.data[1].slice(0, 3).join(' ');
@@ -735,7 +747,7 @@ const Home = () => {
         let linkedinReactionsFile = zip.file('Reactions.csv') ||
           zip.file(innerZipFolder + 'Reactions.csv');
         if (linkedinReactionsFile) {
-          console.log('Processing linkedin likes');
+          addLog("<div>Processing LinkedIn likes</div>");
           const data = await linkedinReactionsFile.async('text');
           const csv = Papa.parse(data);
           const timestamps = csv.data.slice(1, -1).filter(arr => arr[1] === 'LIKE').map(arr => new Date(arr[0]).toString());
@@ -745,7 +757,7 @@ const Home = () => {
         let linkedinSharesFile = zip.file('Shares.csv') ||
           zip.file(innerZipFolder + 'Shares.csv');
         if (linkedinSharesFile) {
-          console.log('Processing linkedin posts');
+          addLog("<div>Processing LinkedIn posts</div>");
           const data = await linkedinSharesFile.async('text');
           const csv = Papa.parse(data);
           const timestamps = csv.data.slice(1, -1).map(arr => new Date(arr[0]).toString());
@@ -757,7 +769,7 @@ const Home = () => {
         let linkedinAdTargetingFile = zip.file('Ad_Targeting.csv') ||
           zip.file(innerZipFolder + 'Ad_Targeting.csv');
         if (linkedinAdTargetingFile) {
-          console.log('Processing linkedin ad targetting');
+          addLog("<div>Processing LinkedIn ad targetting</div>");
           const data = await linkedinAdTargetingFile.async('text');
           const csv = Papa.parse(data);
           const profile = [];
@@ -775,7 +787,7 @@ const Home = () => {
         let linkedinConnectionsFile = zip.file('Connections.csv') ||
           zip.file(innerZipFolder + 'Connections.csv');
         if (linkedinConnectionsFile) {
-          console.log('Processing linkedin connections');
+          addLog("<div>Processing LinkedIn connections</div>");
           const data = await linkedinConnectionsFile.async('text');
           const csv = Papa.parse(data);
           const connections = csv.data.slice(4).map(arr => ({
@@ -788,6 +800,105 @@ const Home = () => {
           const positions = csv.data.slice(4).map(arr => arr[5]);
           addGoogle('connectedPositions', positions);
         }
+
+        // ---------------------------------
+        // ------------Spotify--------------
+        // ---------------------------------
+
+        let spotifyPaymentsFile = zip.file('Spotify Account Data/Payments.json') ||
+          zip.file(innerZipFolder + 'Spotify Account Data/Payments.json');
+        if (spotifyPaymentsFile) {
+          addLog("<div>Processing Spotify payments</div>");
+          const data = await spotifyPaymentsFile.async('text');
+          const json = JSON.parse(data);
+          const paymentMethod = json.payment_method;
+          if (paymentMethod) addPi('Payment', 'spotify', [paymentMethod]);
+        }
+
+        let spotifySearchQueriesFile = zip.file('Spotify Account Data/SearchQueries.json') ||
+          zip.file(innerZipFolder + 'Spotify Account Data/SearchQueries.json');
+        if (spotifySearchQueriesFile) {
+          addLog("<div>Processing Spotify search queries</div>");
+          const data = await spotifySearchQueriesFile.async('text');
+          const json = JSON.parse(data);
+          let searches = json.map(({searchQuery}) => searchQuery);
+          // Spotify returns result for your every keystroke, resulting in incomplete searches that need to be elimiated
+          searches = searches.filter(targetSearch => !searches.find(search => search.includes(targetSearch) && search !== targetSearch));
+          if (searches.length > 0) addContent('searched', 'spotify', searches);
+        }
+
+        let spotifyAudiobookFile = zip.file('Spotify Account Data/StreamingHistory_audiobook_0.json') ||
+          zip.file(innerZipFolder + 'Spotify Account Data/StreamingHistory_audiobook_0.json');
+        if (spotifyAudiobookFile) {
+          addLog("<div>Processing Spotify audiobooks</div>");
+          const data = await spotifyAudiobookFile.async('text');
+          const json = JSON.parse(data);
+          const activity = json.map(({endTime, audiobookName, authorName, msPlayed}) => ({
+            timestamp: new Date(endTime).toString(),
+            name: audiobookName,
+            msPlayed
+          }));
+          if (activity.length > 1) addSpotify('audiobook', activity);
+        }
+
+        let spotifyPodcastFile = zip.file('Spotify Account Data/StreamingHistory_podcast_0.json') ||
+          zip.file(innerZipFolder + 'Spotify Account Data/StreamingHistory_podcast_0.json');
+        if (spotifyPodcastFile) {
+          addLog("<div>Processing Spotify podcasts</div>");
+          const data = await spotifyPodcastFile.async('text');
+          const json = JSON.parse(data);
+          const activity = json.map(({endTime, podcastName, msPlayed}) => ({
+            timestamp: new Date(endTime).toString(),
+            name: podcastName,
+            msPlayed
+          }));
+          if (activity.length > 1) addSpotify('podcast', activity);
+        }
+
+        let spotifyMusicFile = zip.file('Spotify Account Data/StreamingHistory_music_0.json') ||
+          zip.file(innerZipFolder + 'Spotify Account Data/StreamingHistory_music_0.json');
+        if (spotifyMusicFile) {
+          addLog("<div>Processing Spotify music</div>");
+          const data = await spotifyMusicFile.async('text');
+          const json = JSON.parse(data);
+          const activity = json.map(({endTime, trackName, artistName, msPlayed}) => ({
+            timestamp: new Date(endTime).toString(),
+            name: trackName,
+            artist: artistName,
+            msPlayed
+          }));
+          if (activity.length > 1) addSpotify('music', activity);
+        }
+
+        let spotifyInferencesFile = zip.file('Spotify Account Data/Inferences.json') ||
+          zip.file(innerZipFolder + 'Spotify Account Data/Inferences.json');
+        if (spotifyInferencesFile) {
+          addLog("<div>Processing Spotify inferences</div>");
+          const data = await spotifyInferencesFile.async('text');
+          const json = JSON.parse(data);
+          const recommendedTopics = [];
+          const demographic = [];
+          const profile = [];
+          const profileTags = ['1P_Custom_', '3P_Custom', '3P_'];
+          json.inferences.forEach(inference => {
+              if (inference.startsWith('interest_') || inference.startsWith('content_')) {
+                const fragments = inference.split('_');
+                recommendedTopics.push(fragments[fragments.length - 1].replaceAll('-', ' '));
+              } else if (inference.startsWith('demographic_')) {
+                demographic.push(inference.replace('demographic_', '').replaceAll('_', ' '));
+              } else if (inference.match(/^[1P_Custom_|3P_]/)) {
+                const inferenceField = (inference.match(/\[(.+)\]/) || ['Standard attributes'])[0];
+                const parsedInference = inference.replace('1P_Custom_', '').replace('3P_Custom_', '').replace('3P_', '')
+                                          .replace(/\s\[(.+)\]/, '').replace(/_[A-Z][A-Z]$/, '').replace(/^_/, '').replaceAll('_', ' ');
+                if (!profile.find(({field}) => field === inferenceField)) profile.push({field: inferenceField, values: []});
+                profile.find(({field}) => field === inferenceField).values = Array.from(new Set(profile.find(({field}) => field === inferenceField).values).union(new Set([parsedInference])));
+              }
+          })
+          addTopics('recommendedTopics', 'spotify', recommendedTopics);
+          addPi('Demographic', 'spotify', demographic);
+          addLinkedin('spotifyProfile', profile);
+        }
+
         
         // ---------------------------------
         // ------------Misc-----------------
@@ -798,7 +909,7 @@ const Home = () => {
         const types = ['posted', 'messaged', 'searched', 'viewed', 'youtubeWatched'];
         for (const type of types) {
           if (db[type + 'Content']) {
-            console.log(`Updating ${type} topics`);
+            addLog(`<div>Updating ${type} topics</div>`);
             const document = db[type + 'Content'].reduce((allText, obj) => allText.concat(obj.texts), []);
             const numberOfTopics = 20;
             const topics = new lda(document, numberOfTopics, 5).map((topic, id) => {
@@ -807,7 +918,7 @@ const Home = () => {
             }).flat();
             db[type + 'Topics'] = topics;
   
-            console.log(`Updating ${type} sentiment`);
+            addLog(`<div>Updating ${type} sentiment</div>`);
             const sentiment = new Sentiment();
             const result = db[type + 'Content'].map(({source, texts}) => 
               ({source, sentiments: texts.map(text => sentiment.analyze(text).comparative)}));
@@ -816,22 +927,25 @@ const Home = () => {
         }
 
       } catch(e) {
-        console.error('Unexpected error processing file: ' + e.message);
+        addLog(`<div class='warning'>Unexpected error processing file: ${e.message}</div>`);
       }
     
       const ok = await window.api.writeDB(db);
       setDB({...db});
-      setFileUploadStatus(ok ? "File processed successfully" : warningStatusPrefix + "File processing failed");
+      addLog(ok ? "<div class='success'>File processed successfully</div>": "<div className='warning'>File processing failed</div>");
+      setProcessing(false);
     } else {
-      setFileUploadStatus(warningStatusPrefix + "No file selected")
+      addLog("<div class='warning'>File processing failed</div>", true);
+      setProcessing(false);
     }
   }
 
   const clearData = async () => {
-    setFileUploadStatus(loadingStatus);
+    addLog("<div>Clearing data</div>", true);
     const ok = await window.api.writeDB({});
     setDB({});
-    setFileUploadStatus(ok ? "Successfully cleared all data" : warningStatusPrefix + "Failed to clear all data");
+    addLog(ok ? "<div class='success'>Successfully cleared all data</div>" : "<div className='warning'>Failed to clear all data</div>");
+    setProcessing(false);
   }
 
   return (
@@ -872,8 +986,9 @@ const Home = () => {
               <button onClick={() => {setInstructionCard(instructionCard === 'google' ? '' : 'google')}} className={instructionCard === 'google' ? 'highlighted' : ''}>Google</button>&nbsp;
               <button onClick={() => {setInstructionCard(instructionCard === 'instagram' ? '' : 'instagram')}} className={instructionCard === 'instagram' ? 'highlighted' : ''}>Instagram</button>&nbsp;
               <button onClick={() => {setInstructionCard(instructionCard === 'facebook' ? '' : 'facebook')}} className={instructionCard === 'facebook' ? 'highlighted' : ''}>Facebook</button>&nbsp;
-              {/* <button onClick={() => {setInstructionCard(instructionCard === 'x' ? '' : 'x')}} className={instructionCard === 'x' ? 'highlighted' : ''}>X (Twitter)</button>&nbsp; */}
               <button onClick={() => {setInstructionCard(instructionCard === 'linkedin' ? '' : 'linkedin')}} className={instructionCard === 'linkedin' ? 'highlighted' : ''}>LinkedIn</button>&nbsp;
+              <button onClick={() => {setInstructionCard(instructionCard === 'spotify' ? '' : 'spotify')}} className={instructionCard === 'spotify' ? 'highlighted' : ''}>Spotify</button>&nbsp;
+
               {
                 instructionCard === 'google' &&
                 <Card toggleCard={() => {setInstructionCard('')}} title='Download your data from Google' content=
@@ -923,18 +1038,19 @@ const Home = () => {
                 </ol>
                 }/>
               }
-              {/* {
-                instructionCard === 'x' &&
-                <Card toggleCard={() => {setInstructionCard('')}} title='Download your data from X (Twitter)' content=
+              {
+                instructionCard === 'spotify' &&
+                <Card toggleCard={() => {setInstructionCard('')}} title='Download your data from Spotify' content=
                 {
                   <ol>
-                    <li>Go to <a href='https://x.com/settings/download_your_data' target='_blank'>https://x.com/settings/download_your_data</a> while logged in to your Twitter account</li>
-                    <li>Click <strong>Request archive</strong><br/><img src={require('../img/twitter1.png')} /></li>
-                    <li>Your request has been sent and it might take a couple of hours or days<br/><img src={require('../img/twitter2.png')} /></li>
-                    <li>Download your data when you have received this email from Twitter, your data downloads should be files in the form of <strong>twitter-xxxx-xxx.zip</strong><br/><img src={require('../img/twitter3.png')} /></li>
+                    <li>Go to <a href='https://www.spotify.com/uk/account/privacy/' target='_blank'>https://www.spotify.com/uk/account/privacy/</a> while logged in to your Spotify account</li>
+                    <li>Scroll to the bottom and click <strong>Select Account data</strong> and <strong>Request data</strong><br/><img src={require('../img/spotify1.png')} /></li>
+                    <li>Check your email and confirm the request<br/><img src={require('../img/spotify2.png')} /></li>
+                    <li>Your request has been sent and it might take a couple of days<br/><img src={require('../img/spotify3.png')} /></li>
+                    <li>Download your data when you have received this email from Spotify, your data downloads should be files in the form of <strong>my_spotify_data.zip</strong><br/><img src={require('../img/spotify4.png')} /></li>
                 </ol>
                 }/>
-              } */}
+              }
               {
                 instructionCard === 'linkedin' &&
                 <Card toggleCard={() => {setInstructionCard('')}} title='Download your data from LinkedIn' content=
@@ -957,11 +1073,11 @@ const Home = () => {
               Explore data of different categories, for example Activity, Topics, Locations and different apps
               <h5><li>Want to take control of your data?</li></h5>
               <u><strong>Take action</strong></u> to inspect all your data, set your data preferences and delete data you don't want online platforms to keep:<br/>
-              <button onClick={() => {setDeleteCard(deleteCard === 'google' ? '' : 'google')}} className={deleteCard === 'google' ? 'highlighted' : ''}>Google</button>&nbsp;
-              <button onClick={() => {setDeleteCard(deleteCard === 'instagram' ? '' : 'instagram')}} className={deleteCard === 'instagram' ? 'highlighted' : ''}>Instagram</button>&nbsp;
+              <button onClick={() => {setInstructionCard(instructionCard === 'googleDelete' ? '' : 'googleDelete')}} className={instructionCard === 'googleDelete' ? 'highlighted' : ''}>Google</button>&nbsp;
+              <button onClick={() => {setInstructionCard(instructionCard === 'instagramDelete' ? '' : 'instagramDelete')}} className={instructionCard === 'instagramDelete' ? 'highlighted' : ''}>Instagram</button>&nbsp;
               {
-                deleteCard === 'google' &&
-                <Card toggleCard={() => {setDeleteCard('')}} title='Inspect and delete your google data' content=
+                instructionCard === 'googleDelete' &&
+                <Card toggleCard={() => {setInstructionCard('')}} title='Inspect and delete your google data' content=
                 {
                   <ul>
                     <li>Google data and privacy dashboard: <a href='https://myaccount.google.com/data-and-privacy' target='_blank'>https://myaccount.google.com/data-and-privacy</a></li>
@@ -971,8 +1087,8 @@ const Home = () => {
                 }/>
               }
               {
-                deleteCard === 'instagram' &&
-                <Card toggleCard={() => {setDeleteCard('')}} title='Inspect and delete your Instagram (Meta) data' content=
+                instructionCard === 'instagramDelete' &&
+                <Card toggleCard={() => {setInstructionCard('')}} title='Inspect and delete your Instagram (Meta) data' content=
                 {
                   <ul>
                     <li>High level overview of your data at Meta accounts centre: <a href='https://accountscenter.facebook.com/info_and_permissions' target='_blank'>https://accountscenter.facebook.com/info_and_permissions</a></li>
@@ -987,14 +1103,17 @@ const Home = () => {
           <div className='upload-container'>
             <h4>Process your data downloads</h4>
             <div>Please upload a zip file</div>
-            <input type='file' formEncType='multipart/form-data' name='zipfile' onChange={ (e) => {setFile(e.target.files[0]); setFileUploadStatus('')}}></input>
+            <input type='file' formEncType='multipart/form-data' name='zipfile' onChange={ (e) => {setFile(e.target.files[0]);}}></input>
             <div className='mt-2 mb-3'>
-              <button onClick={ uploadFile }>Upload file</button>
-              {fileUploadStatus && 
-                fileUploadStatus === loadingStatus ? <span><span className='loading-icon'></span> Please wait and do not refresh or close the window, this might take a while depending on file size and your computer</span>: 
-                fileUploadStatus.includes(warningStatusPrefix) ? 
-                  <span className='warning'> {fileUploadStatus.replace(warningStatusPrefix, '')}</span> :
-                  <span className='success'> {fileUploadStatus}</span>}
+              <button onClick={ () => { setInstructionCard('upload'); setProcessing(true); uploadFile(); } }>Upload file</button>
+              {
+                instructionCard === 'upload' && 
+                <Card toggleCard={() => {setInstructionCard('')}} 
+                title={processing ? <span>Processing <span className='loading-icon'></span></span> : <span>Processing ended</span>} content=
+                {
+                  <div id='upload-progress-container'></div>
+                }/>
+              }
             </div>
             <div>
               <strong>Your data downloads</strong>
@@ -1005,7 +1124,7 @@ const Home = () => {
                 {downloadFiles.map((file, index) => (
                   <div key={index}>{file}</div>
                 ))}
-                <button onClick={ clearData }>Clear all my data</button></div>:
+                <button onClick={ () => { setInstructionCard('upload'); setProcessing(true); clearData(); } }>Clear all my data</button></div>:
                 <div>You do not have any data downloads</div>}
             </div>
           </div>
@@ -1018,6 +1137,7 @@ const Home = () => {
           <Google db={ db } isHome={ true }/>
           <Instagram db={ db } isHome={ true }/>
           <Linkedin db={ db } isHome={ true }/>
+          <Spotify db={ db } isHome={ true }/>
         </div>
       </div>
     </div>

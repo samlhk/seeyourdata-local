@@ -53,6 +53,19 @@ li {
   flex-direction: column;
 }
 
+#upload-progress-container {
+  font-family: monospace, Arial, Helvetica, sans-serif;
+  background: rgb(233, 233, 233);
+  margin: 1rem;
+  padding: 1rem;
+  border: solid black 3px;
+  word-wrap: break-word;
+}
+
+#upload-progress-container > div:nth-child(even) {
+  background: rgb(211, 211, 211);
+}
+
 .loading-icon {
   margin-left: 1rem;
   width: 1.25rem;

@@ -46,6 +46,15 @@ export const colorScheme = [
     'rgb(0, 64, 255, 0.8)',
     'rgb(128, 0, 255, 0.8)',
     'rgb(255, 0, 64, 0.8)'
+  ],
+  // Spotify
+  [
+    '#1ed760',
+    '#121212',
+    '#E1306C',
+    '#FCAF45',
+    '#405DE6',
+    'lightgrey'
   ]
 ]
 
@@ -62,6 +71,7 @@ function App() {
           <Route path='/google' element={ <Page category='google'/> }/>
           <Route path='/instagram' element={ <Page category='instagram'/> }/>
           <Route path='/linkedin' element={ <Page category='linkedin'/> }/>
+          <Route path='/spotify' element={ <Page category='spotify'/> }/>
       </Routes>
     </Router>
   );
